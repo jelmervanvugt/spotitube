@@ -1,6 +1,7 @@
 package nl.han.ica.dea.controllers;
 
 import nl.han.ica.dea.dto.LoginDTO;
+import nl.han.ica.dea.dto.LoginResponseDTO;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -14,9 +15,10 @@ public class LoginController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response login(LoginDTO loginDTO) {
         if(checkCredentials(loginDTO)) {
+
             return Response
                     .status(Response.Status.OK)
-                    .entity(loginDTO)
+                    .entity(new LoginResponseDTO(loginDTO.getUser(), "1234-1234-1234"))
                     .build();
         }
         return Response
