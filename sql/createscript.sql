@@ -11,16 +11,11 @@ token							varchar(15)			null,
 
 primary key(id)
 );
+create table album (
+id									int							not null auto_increment,
+name							varchar(250)		not null,
 
-create table playlist (
-id									int 							not null auto_increment,
-name							varchar(50)			not null,
-owner						boolean 				not null,
-trackid						int							null,
-
-primary key(id),
-foreign key(owner) references user(id),
-foreign key(trackid) references track(id)
+primary key(id)
 );
 
 create table track (
@@ -38,9 +33,16 @@ primary key(id),
 foreign key(album) references album(id)
 );
 
-create table album (
-id									int							not null auto_increment,
-name							varchar(250)		not null,
+create table playlist (
+id									int 							not null auto_increment,
+name							varchar(50)			not null,
+owner						int 							not null,
+trackid						int							null,
 
-primary key(id)
-)
+primary key(id),
+foreign key(owner) references user(id),
+foreign key(trackid) references track(id)
+);
+
+
+
