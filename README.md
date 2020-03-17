@@ -1,5 +1,5 @@
 # spotitube
 
-<h1>ey max u kind of a faggot man ngl</h1>
+<h1 style="color: pink">if u read this ur gay lol</h1>
 
  
