@@ -29,8 +29,7 @@ public class testdao {
 
             Statement stmt = connection.createStatement();
             resultSet = stmt.executeQuery("select * from test");
-
-
+            
             ResultSetMetaData rsmd = resultSet.getMetaData();
             int columnsNumber = rsmd.getColumnCount();
             while (resultSet.next()) {

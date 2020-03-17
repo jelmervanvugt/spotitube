@@ -5,7 +5,7 @@ use spotitube;
 create table user (
 id									int							not null auto_increment,
 fullname						varchar(250)		not null,
-user							varchar(20)			not null,
+user							varchar(50)			not null,
 password					varchar(50)			not null,
 token							varchar(15)			null,
 
