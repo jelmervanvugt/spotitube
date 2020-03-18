@@ -2,7 +2,7 @@ package nl.han.ica.dea.dto;
 
 public class LoginResponseDTO {
 
-    private String user, token;
+    private String token, user;
 
     public LoginResponseDTO() {
         //
@@ -10,8 +10,8 @@ public class LoginResponseDTO {
 
     public LoginResponseDTO(String user, String token) {
 
-        this.user = user;
         this.token = token;
+        this.user = user;
     }
 
     public String getUser() {

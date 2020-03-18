@@ -22,9 +22,7 @@ public class DatabaseProperties {
         }
     }
 
-    public String connectionString() {
-        return properties.getProperty("connectionString");
-    }
+    public String connectionString() { return properties.getProperty("connectionString"); }
 
     public String driverString() {
         return properties.getProperty("driver");
