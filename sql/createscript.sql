@@ -17,7 +17,8 @@ create table performer (
 id									int							not null auto_increment,
 name 						varchar(100)		not null,
 
-primary key(id)
+primary key(id),
+unique(name)
 );
 
 create table track (
@@ -38,12 +39,20 @@ foreign key(id) references performer(id)
 create table playlist (
 id									int 							not null auto_increment,
 name							varchar(50)			not null,
-owner						int 							not null,
 trackid						int							null,
 
 primary key(id),
-foreign key(owner) references user(id),
 foreign key(trackid) references track(id)
+);
+
+create table userplaylist (
+userid							int							not null,
+playlistid						int							not null,
+isowner						boolean				not null,
+
+primary key(userid, playlistid),
+foreign key(userid) references user(id),
+foreign key (playlistid) references playlist(id)
 );
 
 

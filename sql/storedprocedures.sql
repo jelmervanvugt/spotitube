@@ -9,7 +9,7 @@ in 		password 	varchar(50)
 )
 begin
 
-		select 			count(*) 
+		select 			count(*) as nUsers
 		from 				user u 
 		where 			u.user = user
 		and 				u.password = password;
@@ -25,14 +25,8 @@ in 		user		 		varchar(50),
 in 		password 	varchar(50)
 )
 begin
-
-			update user u set token = concat(
-            cast(floor(rand()*(999-100+1)+100) as char(3)),"-", 
-            cast(floor(rand()*(999-100+1)+100) as char(3)), "-", 
-            cast(floor(rand()*(999-100+1)+100) as char(3)))
-            where u.user = user;
             
-            select token, fullname 
+            select *
             from user u 
             where u.user = user
             and u.password = password;
@@ -71,6 +65,33 @@ begin
 		
 end //
 delimiter ;
+
+/* genereert een token */
+delimiter //
+drop procedure if exists generateToken //
+create procedure generateToken (
+in 		user		 		varchar(50), 
+in 		password 	varchar(50)
+)
+begin
+            
+           update user u set token = concat(
+            cast(floor(rand()*(999-100+1)+100) as char(3)),"-", 
+            cast(floor(rand()*(999-100+1)+100) as char(3)), "-", 
+            cast(floor(rand()*(999-100+1)+100) as char(3)))
+            where u.user = user;
+		
+end //
+delimiter ;
+
+-- select * from user;
+
+insert into user (fullname, user, password) values 
+("fullname", "user", "password"); 
+
+-- call getUser("user", "password");
+
+
 
 
 
