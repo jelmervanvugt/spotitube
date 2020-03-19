@@ -17,7 +17,6 @@ public class PlaylistsDAO {
     public PlaylistsDTO getAllPlaylists(String token) {
         PlaylistsDTO playlistsDTO = null;
         try {
-
             rs = queryPlaylistInfo(token);
             ArrayList<PlaylistDTO> playlists = getPlaylistInfo();
             int playlistLength = getPlaylistsLength(playlists);
