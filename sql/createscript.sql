@@ -48,8 +48,8 @@ playlistid						int							not null,
 trackid						int							not null,
 
 primary key(playlistid, trackid),
-foreign key(trackid) references track(id),
-foreign key(playlistid) references playlist(id)
+foreign key(trackid) references track(id) on delete cascade,
+foreign key(playlistid) references playlist(id) on delete cascade
 );
 
 create table userplaylist (
@@ -58,8 +58,8 @@ playlistid						int							not null,
 isowner						boolean				not null,
 
 primary key(userid, playlistid),
-foreign key(userid) references user(id),
-foreign key (playlistid) references playlist(id)
+foreign key(userid) references user(id) on delete cascade,
+foreign key (playlistid) references playlist(id) on delete cascade
 );
 
 

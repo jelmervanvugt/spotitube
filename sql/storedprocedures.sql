@@ -97,8 +97,34 @@ begin
 end //
 delimiter ;
 
+/* delete een playlist */
+delimiter //
+drop procedure if exists deletePlaylist //
+create procedure deletePlaylist (
+in		playlistid			int
+)
+begin
+		delete 
+        from playlist p
+        where id = playlistid;
+end //
+delimiter ;
 
-
+/* delete een playlist */
+delimiter //
+drop procedure if exists doesUserOwnPlaylist //
+create procedure doesUserOwnPlaylist (
+in 		token		 		varchar(14),
+in		playlistid			int
+)
+begin
+		 select up.isOwner
+		from user u, userplaylist up
+         where u.token = token
+         and u.id = up.userid
+         and up.playlistid = playlistid;
+end //
+delimiter ;
 
 
 
