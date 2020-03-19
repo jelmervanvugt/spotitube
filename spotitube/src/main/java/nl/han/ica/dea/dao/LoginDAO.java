@@ -10,10 +10,6 @@ public class LoginDAO {
     private DatabaseProperties dbp = new DatabaseProperties();
     private ResultSet rs;
 
-    public LoginDAO() {
-        initConnection();
-    }
-
     public boolean checkCredentials(String user, String password) {
         try {
             queryDb(user, password);
@@ -25,6 +21,15 @@ public class LoginDAO {
             System.out.println("Foutmelding in LoginDAO");
         }
         return true;
+    }
+
+    public void closeConnection() {
+        try {
+            connection.close();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public String getToken(String user, String password) {
@@ -57,7 +62,7 @@ public class LoginDAO {
         return fullName;
     }
 
-    private void initConnection() {
+    public void initConnection() {
         try {
             Class.forName(dbp.driverString());
             connection = DriverManager.getConnection(dbp.connectionString());
