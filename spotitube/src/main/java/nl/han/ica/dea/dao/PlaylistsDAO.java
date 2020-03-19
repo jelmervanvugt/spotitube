@@ -30,6 +30,7 @@ public class PlaylistsDAO {
               queryDeletePlaylist(id);
                 response = Response
                         .status(Response.Status.OK)
+                        .entity(getAllPlaylists(token))
                         .build();
             }
         return response;

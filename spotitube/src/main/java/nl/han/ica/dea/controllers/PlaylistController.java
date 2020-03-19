@@ -14,7 +14,7 @@ public class PlaylistController {
 
     private PlaylistsDAO playlistsDAO;
 
-    @GET
+    @DELETE
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deletePlaylist(@PathParam("id") int id, @QueryParam("token") String token) {
