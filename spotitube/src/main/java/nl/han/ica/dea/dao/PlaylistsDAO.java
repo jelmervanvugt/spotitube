@@ -5,6 +5,7 @@ import nl.han.ica.dea.dto.PlaylistDTO;
 import nl.han.ica.dea.dto.PlaylistsDTO;
 import nl.han.ica.dea.dto.TrackDTO;
 
+import javax.ws.rs.core.Response;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -14,18 +15,24 @@ public class PlaylistsDAO {
     private DatabaseProperties dbp = new DatabaseProperties();
     private ResultSet rs;
 
-    public PlaylistsDTO getAllPlaylists(String token) {
+    public PlaylistsDTO getAllPlaylists(String token) throws SQLException {
         PlaylistsDTO playlistsDTO = null;
-        try {
             rs = queryPlaylistInfo(token);
             ArrayList<PlaylistDTO> playlists = getPlaylistInfo();
             int playlistLength = getPlaylistsLength(playlists);
             playlistsDTO = new PlaylistsDTO(playlists, playlistLength);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
         return playlistsDTO;
+    }
+
+    public Response deletePlaylist(String token, int id) throws SQLException {
+        Response response = null;
+            if(isOwner(token, id)) {
+              queryDeletePlaylist(id);
+                response = Response
+                        .status(Response.Status.OK)
+                        .build();
+            }
+        return response;
     }
 
     public void closeConnection() {
@@ -43,6 +50,21 @@ public class PlaylistsDAO {
         } catch (SQLException | ClassNotFoundException e) {
             System.out.println("Error connecting to a database: " + e);
         }
+    }
+
+    private void queryDeletePlaylist(int id) throws SQLException {
+        Statement stmt = connection.createStatement();
+        rs = stmt.executeQuery("call deletePlaylist(" + id + ");");
+    }
+
+    private boolean isOwner(String token, int id) throws SQLException {
+        boolean isOwner = false;
+        Statement stmt = connection.createStatement();
+        rs = stmt.executeQuery("call doesUserOwnPlaylist(\"" + token + "\", " + id + ");");
+        while(rs.next()) {
+            isOwner = rs.getBoolean("isOwner");
+        }
+        return isOwner;
     }
 
     private ResultSet queryPlaylistInfo(String token) throws SQLException {

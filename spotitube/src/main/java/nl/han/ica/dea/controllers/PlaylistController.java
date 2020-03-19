@@ -18,22 +18,34 @@ public class PlaylistController {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deletePlaylist(@PathParam("id") int id, @QueryParam("token") String token) {
-
-        return null;
-
+        Response response = null;
+        playlistsDAO.initConnection();
+        try {
+            return playlistsDAO.deletePlaylist(token, id);
+        } catch (SQLException e) {
+            response = Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .build();
+        }
+        playlistsDAO.closeConnection();
+        return response;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllPlaylists(@QueryParam("token") String token) {
-        Response response;
+        Response response = null;
         playlistsDAO.initConnection();
-
-        response = Response
-                .status(Response.Status.OK)
-                .entity(playlistsDAO.getAllPlaylists(token))
-                .build();
-
+        try {
+            response = Response
+                    .status(Response.Status.OK)
+                    .entity(playlistsDAO.getAllPlaylists(token))
+                    .build();
+        } catch(SQLException e) {
+            response = Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .build();
+        }
         playlistsDAO.closeConnection();
         return response;
     }
