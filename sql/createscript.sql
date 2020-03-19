@@ -39,10 +39,17 @@ foreign key(id) references performer(id)
 create table playlist (
 id									int 							not null auto_increment,
 name							varchar(50)			not null,
-trackid						int							null,
 
-primary key(id),
-foreign key(trackid) references track(id)
+primary key(id)
+);
+
+create table playlistsong (
+playlistid						int							not null,
+trackid						int							not null,
+
+primary key(playlistid, trackid),
+foreign key(trackid) references track(id),
+foreign key(playlistid) references playlist(id)
 );
 
 create table userplaylist (

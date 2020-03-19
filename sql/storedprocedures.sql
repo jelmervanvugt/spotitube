@@ -42,11 +42,11 @@ in 		token		 		varchar(14)
 )
 begin
 
-			select 		p.id, p.name, up.owner
-            from			playlist p, userplaylist up, user u
-            where		user.token = token
-            and				user.id = up.userid
-            and				p.id = up.playlistid;
+		select p.id, p.owner, up.owner
+        from playlist p, userplaylist up, user u
+        where u.token = token
+        and u.id = up.id
+        and p.id = up.id;
 		
 end //
 delimiter ;
@@ -59,9 +59,9 @@ in 		playlistid		 		int
 )
 begin
 
-			select  *
-            from track t, playlist p
-            where  t.id = p.trackid;
+			select songid
+            from playlistsong ps
+            where ps.playlistid = playlistid;
 		
 end //
 delimiter ;
@@ -84,12 +84,7 @@ begin
 end //
 delimiter ;
 
--- select * from user;
 
-insert into user (fullname, user, password) values 
-("fullname", "user", "password"); 
-
--- call getUser("user", "password");
 
 
 
