@@ -37,4 +37,7 @@ insert into playlistsong(playlistid, trackid) values
 (2, 5),
 (2, 6);
 
+select * from user
+
+
 

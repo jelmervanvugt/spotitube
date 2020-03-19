@@ -57,7 +57,7 @@ public class PlaylistsDAO {
             playlists.add(new PlaylistDTO(
                     rs.getInt("id"),
                     rs.getString("name"),
-                    rs.getBoolean("owner"),
+                    rs.getBoolean("isowner"),
                     new ArrayList<TrackDTO>()));
         }
         return playlists;

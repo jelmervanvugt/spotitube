@@ -15,16 +15,14 @@ public class PlaylistController {
     private PlaylistsDAO playlistsDAO;
 
     @GET
-    @Path("{token}")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllPlaylists(@PathParam("token") String token) {
+    public Response getAllPlaylists(@QueryParam("token") String token) {
         Response response;
         playlistsDAO.initConnection();
 
         response = Response
                 .status(Response.Status.OK)
-                .entity(new PlaylistsDAO().getAllPlaylists(token))
+                .entity(playlistsDAO.getAllPlaylists(token))
                 .build();
 
         playlistsDAO.closeConnection();

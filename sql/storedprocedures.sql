@@ -42,11 +42,11 @@ in 		token		 		varchar(14)
 )
 begin
 
-		select p.id, p.owner, up.owner
+		select p.id, p.name, up.isowner
         from playlist p, userplaylist up, user u
         where u.token = token
-        and u.id = up.id
-        and p.id = up.id;
+        and u.id = up.userid
+        and p.id = up.playlistid;
 		
 end //
 delimiter ;
@@ -74,15 +74,30 @@ in 		user		 		varchar(50),
 in 		password 	varchar(50)
 )
 begin
-            
-           update user u set token = concat(
-            cast(floor(rand()*(999-100+1)+100) as char(3)),"-", 
-            cast(floor(rand()*(999-100+1)+100) as char(3)), "-", 
-            cast(floor(rand()*(999-100+1)+100) as char(3)))
+                    update user u set token = concat(
+					cast(floor(rand()*(999-100+1)+100) as char(3)),"-", 
+					cast(floor(rand()*(999-100+1)+100) as char(3)), "-", 
+					cast(floor(rand()*(999-100+1)+100) as char(3)))
             where u.user = user;
-		
 end //
 delimiter ;
+
+/* returned de lengte van een playlist */
+delimiter //
+drop procedure if exists getPlaylistLength //
+create procedure getPlaylistLength (
+in 		playlistid		 	int
+)
+begin
+       select sum(duration) as playlistlength
+       from track t, playlist p, playlistsong ps
+       where p.id = playlistid
+       and ps.playlistid = playlistid
+       and ps.trackid = t.id;
+end //
+delimiter ;
+
+
 
 
 
