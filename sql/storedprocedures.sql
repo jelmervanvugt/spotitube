@@ -143,6 +143,21 @@ begin
 end //
 delimiter ;
 
+/* wijzigt de naam van een playlist */
+delimiter //
+drop procedure if exists editPlaylistName //
+create procedure editPlaylistName (
+in 		playlistid		 					int,
+in		playlistname					varchar(50)
+)
+begin
+			update playlist
+            set name = playlistname
+            where id = playlistid;
+end //
+delimiter ;
+
+
 
 
 

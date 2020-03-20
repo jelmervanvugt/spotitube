@@ -14,6 +14,22 @@ public class PlaylistController {
 
     private PlaylistsDAO playlistsDAO;
 
+    @PUT
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response editPlaylist(PlaylistDTO playlist, @PathParam("id") int id, @QueryParam("token") String token) {
+       Response response = null;
+       playlistsDAO.initConnection();
+       try {
+           return playlistsDAO.editPlaylistName(token, playlist);
+       } catch(SQLException e) {
+          e.printStackTrace();
+       }
+       playlistsDAO.closeConnection();
+       return response;
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

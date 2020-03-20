@@ -3,7 +3,6 @@ package nl.han.ica.dea.dao;
 import nl.han.ica.dea.database.util.DatabaseProperties;
 import nl.han.ica.dea.dto.PlaylistDTO;
 import nl.han.ica.dea.dto.PlaylistsDTO;
-import nl.han.ica.dea.dto.TrackDTO;
 
 import javax.ws.rs.core.Response;
 import java.sql.*;
@@ -49,6 +48,22 @@ public class PlaylistsDAO {
         return response;
     }
 
+    public Response editPlaylistName(String token, PlaylistDTO playlist) throws SQLException {
+        Response response = null;
+        if(isOwner(token, playlist.getId())) {
+            queryEditPlaylistName(playlist);
+            response = Response
+                    .status(Response.Status.OK)
+                    .entity(getAllPlaylists(token))
+                    .build();
+        } else {
+            response = Response
+                    .status(Response.Status.UNAUTHORIZED)
+                    .build();
+        }
+        return response;
+    }
+
     public void closeConnection() {
         try {
             connection.close();
@@ -64,6 +79,11 @@ public class PlaylistsDAO {
         } catch (SQLException | ClassNotFoundException e) {
             System.out.println("Error connecting to a database: " + e);
         }
+    }
+
+    private void queryEditPlaylistName(PlaylistDTO playlist) throws SQLException {
+        Statement stmt = connection.createStatement();
+        stmt.executeQuery("call editPlaylistName(" + playlist.getId() + ", \"" + playlist.getName() + "\");");
     }
 
     private void queryAddPlaylist(String token, PlaylistDTO playlistDTO) throws SQLException {
