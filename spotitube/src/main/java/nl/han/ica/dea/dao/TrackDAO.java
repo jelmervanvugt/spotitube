@@ -3,7 +3,6 @@ package nl.han.ica.dea.dao;
 import nl.han.ica.dea.database.util.DatabaseProperties;
 import nl.han.ica.dea.dto.TrackDTO;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.sql.*;
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ public class TrackDAO {
         }
     }
 
-    private void queryGetTracksFromPlaylist(int playlistId) throws SQLException {
+    public void queryGetTracksFromPlaylist(int playlistId) throws SQLException {
         Statement stmt = connection.createStatement();
         rs = stmt.executeQuery("call getTracksFromPlaylist(" + playlistId + ");");
     }

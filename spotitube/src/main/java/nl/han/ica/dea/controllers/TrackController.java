@@ -11,7 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
 
-@Path("tracks")
+@Path("playlists/tracks")
 public class TrackController {
 
     private TrackDAO trackDAO;
