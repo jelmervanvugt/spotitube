@@ -16,23 +16,36 @@ public class PlaylistsDAO {
     private ResultSet rs;
 
     public PlaylistsDTO getAllPlaylists(String token) throws SQLException {
-        PlaylistsDTO playlistsDTO = null;
-            rs = queryPlaylistInfo(token);
-            ArrayList<PlaylistDTO> playlists = getPlaylistInfo();
-            int playlistLength = getPlaylistsLength(playlists);
-            playlistsDTO = new PlaylistsDTO(playlists, playlistLength);
+        PlaylistsDTO playlistsDTO;
+        rs = queryPlaylistInfo(token);
+        ArrayList<PlaylistDTO> playlists = getPlaylistInfo();
+        int playlistLength = getPlaylistsLength(playlists);
+        playlistsDTO = new PlaylistsDTO(playlists, playlistLength);
         return playlistsDTO;
     }
 
     public Response deletePlaylist(String token, int id) throws SQLException {
         Response response = null;
-            if(isOwner(token, id)) {
-              queryDeletePlaylist(id);
-                response = Response
-                        .status(Response.Status.OK)
-                        .entity(getAllPlaylists(token))
-                        .build();
-            }
+        if (isOwner(token, id)) {
+            queryDeletePlaylist(id);
+            response = Response
+                    .status(Response.Status.OK)
+                    .entity(getAllPlaylists(token))
+                    .build();
+        }
+        response = Response
+                .status(Response.Status.BAD_REQUEST)
+                .build();
+        return response;
+    }
+
+    public Response addPlaylist(String token, PlaylistDTO playlistDTO) throws SQLException {
+        Response response = null;
+        queryAddPlaylist(token, playlistDTO);
+        response = Response
+                    .status(Response.Status.CREATED)
+                    .entity(getAllPlaylists(token))
+                    .build();
         return response;
     }
 
@@ -53,6 +66,11 @@ public class PlaylistsDAO {
         }
     }
 
+    private void queryAddPlaylist(String token, PlaylistDTO playlistDTO) throws SQLException {
+        Statement stmt = connection.createStatement();
+        stmt.executeQuery("call addPlaylist(\"" + token + "\", \"" + playlistDTO.getName() + "\");");
+    }
+
     private void queryDeletePlaylist(int id) throws SQLException {
         Statement stmt = connection.createStatement();
         rs = stmt.executeQuery("call deletePlaylist(" + id + ");");
@@ -62,7 +80,7 @@ public class PlaylistsDAO {
         boolean isOwner = false;
         Statement stmt = connection.createStatement();
         rs = stmt.executeQuery("call doesUserOwnPlaylist(\"" + token + "\", " + id + ");");
-        while(rs.next()) {
+        while (rs.next()) {
             isOwner = rs.getBoolean("isOwner");
         }
         return isOwner;
@@ -79,8 +97,7 @@ public class PlaylistsDAO {
             playlists.add(new PlaylistDTO(
                     rs.getInt("id"),
                     rs.getString("name"),
-                    rs.getBoolean("isowner"),
-                    new ArrayList<TrackDTO>()));
+                    rs.getBoolean("isowner")));
         }
         return playlists;
     }

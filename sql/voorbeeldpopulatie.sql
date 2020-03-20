@@ -1,8 +1,8 @@
 use spotitube;
 
-insert into user(fullname, user, password) values
-("Jelmer van Vugt", "jelmo", "jelmo01"),
-("Jelmer van Vugt2", "jelmo2", "jelmo02");
+insert into user(fullname, user, password, token) values
+("Jelmer van Vugt", "jelmo", "jelmo01", "token1"),
+("Jelmer van Vugt2", "jelmo2", "jelmo02", "token2");
 
 insert into performer(id, name) values
 (1, "TestPerformer1"),
@@ -37,7 +37,8 @@ insert into playlistsong(playlistid, trackid) values
 (2, 5),
 (2, 6);
 
-select * from user
+
+
 
 
 

@@ -110,7 +110,7 @@ begin
 end //
 delimiter ;
 
-/* delete een playlist */
+/* kijkt op basis van token en playistid of de user owner van de playlist is*/
 delimiter //
 drop procedure if exists doesUserOwnPlaylist //
 create procedure doesUserOwnPlaylist (
@@ -123,6 +123,23 @@ begin
          where u.token = token
          and u.id = up.userid
          and up.playlistid = playlistid;
+end //
+delimiter ;
+
+/* voegt een playlist toe */
+delimiter //
+drop procedure if exists addPlaylist //
+create procedure addPlaylist (
+in 		token		 						varchar(14),
+in		playlistname					varchar(50)
+)
+begin
+			set @userid = (select id from user u where u.token = token);
+            insert into playlist(name) values
+            (playlistname);
+            set @playlistid = (select id from playlist order by id desc limit 1);
+			insert into userplaylist(userid, playlistid, isowner)
+            values(@userid, @playlistid, true);
 end //
 delimiter ;
 

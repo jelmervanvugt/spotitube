@@ -9,11 +9,14 @@ public class PlaylistDTO {
     private boolean owner;
     private ArrayList<TrackDTO> tracks;
 
-    public PlaylistDTO(int id, String name, boolean owner, ArrayList<TrackDTO> tracks) {
+    public PlaylistDTO() {
+        //nvt
+    }
+
+    public PlaylistDTO(int id, String name, boolean owner) {
         this.id =id;
         this.name = name;
         this.owner = owner;
-        this.tracks = tracks;
     }
 
     public int getId() {
