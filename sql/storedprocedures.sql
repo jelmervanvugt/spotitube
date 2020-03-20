@@ -157,6 +157,21 @@ begin
 end //
 delimiter ;
 
+/* returned alle tracks van de opgegeven playlist */
+delimiter //
+drop procedure if exists getTracksFromPlaylist //
+create procedure getTracksFromPlaylist (
+in 		playlistid		 					int
+)
+begin
+			select t.id, t.title, t.performer, t.duration, t.album, t.playcount, t.publicationDate, t.description, t.offlineAvailable
+            from track t, playlistsong ps
+            where ps.playlistid = playlistid
+            and ps.trackid = t.id;
+end //
+delimiter ;
+
+
 
 
 
