@@ -22,7 +22,7 @@ public class TrackController {
         Response response = null;
         trackDAO.initConnection();
         try {
-            response = trackDAO.getTracksFromPlaylist(playlistId, token);
+            response = trackDAO.getTracksFromPlaylist(playlistId);
         } catch(SQLException e) {
             response = Response
                             .status(Response.Status.BAD_REQUEST)
