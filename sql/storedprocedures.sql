@@ -186,6 +186,65 @@ begin
 end //
 delimiter ;
 
+/* kijkt of track al in de gegeven playlist zit */
+delimiter //
+drop procedure if exists doesPlaylistContainTrack //
+create procedure doesPlaylistContainTrack (
+in 		playlistid		 					int,
+in 		trackid		 					int
+)
+begin
+			select count(*) as nResults
+            from playlistsong ps
+            where ps.playlistid = playlistid
+            and ps.trackid = trackid;
+end //
+delimiter ;
+
+/* voegt track aan playlist toe */
+delimiter //
+drop procedure if exists addTrackToPlaylist //
+create procedure addTrackToPlaylist (
+in 		playlistid		 					int,
+in 		trackid		 					int,
+in		offlineAvailable				boolean
+)
+begin
+			set @userid = (select id from user u where u.token = token limit 1);
+            insert into playlistsong values
+            (playlistid, trackid);
+            update track t
+            set t.offlineAvailable = offlineAvailable
+            where t.id = trackid;
+end //
+delimiter ;
+
+/* returned tracks die niet in playlist zitten */
+delimiter //
+drop procedure if exists getAllTracksNotInPlaylist //
+create procedure getAllTracksNotInPlaylist (
+in 		playlistid		 					int
+)
+begin
+		select *
+        from track t
+        where t.id not in 	(
+										select t.id
+										from track t, playlistsong ps
+                                        where t.id = ps.trackid
+                                        and ps.playlistid = playlistid
+										);
+end //
+delimiter ;
+
+
+
+
+
+
+
+
+
 
 
 

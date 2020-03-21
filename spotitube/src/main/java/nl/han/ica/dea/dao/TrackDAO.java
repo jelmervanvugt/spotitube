@@ -25,14 +25,28 @@ public class TrackDAO {
                 .build();
     }
 
-    public Response addTrackToPlaylist(String token, int playlistId, TrackDTO track) {
+    public Response getTracksNotInPlaylist(int playlistId) throws SQLException {
+        Response response;
+        queryGetTracksNotInPlaylist(playlistId);
+        return response = Response
+                .status(Response.Status.OK)
+                .entity(new TracksDTO(procesTracksFromPlaylist()))
+                .build();
+    }
+
+    public Response addTrackToPlaylist(String token, int playlistId, TrackDTO track) throws SQLException {
         Response response;
         playlistsDAO.initConnection();
-        if(playlistsDAO.isOwner(token, playlistId)) {
-
+        if(playlistsDAO.isOwner(token, playlistId) && queryDoesPlaylistContainTrack(playlistId, track.getId())) {
+            queryAddTrackToPlaylist(playlistId, track);
+            queryGetTracksFromPlaylist(playlistId);
+            response = Response
+                    .status(Response.Status.OK)
+                    .entity(new TracksDTO(procesTracksFromPlaylist()))
+                    .build();
         } else {
             response = Response
-                    .status(Response.Status.UNAUTHORIZED)
+                    .status(Response.Status.BAD_REQUEST)
                     .build();
         }
         playlistsDAO.closeConnection();
@@ -75,9 +89,28 @@ public class TrackDAO {
         }
     }
 
+    private void queryAddTrackToPlaylist(int playlistId, TrackDTO track) throws SQLException {
+        Statement stmt = connection.createStatement();
+        stmt.executeUpdate("call addTrackToPlaylist(" + playlistId + ", " + track.getId() + ", " + track.getOfflineAvailable() + ");");
+    }
+
+    private boolean queryDoesPlaylistContainTrack(int playlistId, int trackId) throws SQLException {
+        Statement stmt = connection.createStatement();
+        rs = stmt.executeQuery("call doesPlaylistContainTrack(" + playlistId + ", " + trackId + ");");
+        while(rs.next()) {
+            if(rs.getInt("nResults") == 0) { return true; }
+        }
+        return false;
+    }
+
     private void queryGetTracksFromPlaylist(int playlistId) throws SQLException {
         Statement stmt = connection.createStatement();
         rs = stmt.executeQuery("call getTracksFromPlaylist(" + playlistId + ");");
+    }
+
+    private void queryGetTracksNotInPlaylist(int playlistId) throws SQLException {
+        Statement stmt = connection.createStatement();
+        rs = stmt.executeQuery("call getAllTracksNotInPlaylist(" + playlistId + ");");
     }
 
     private void queryDeleteTrackFromPlaylist(int playlistId, int trackId) throws SQLException {
