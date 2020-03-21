@@ -25,8 +25,22 @@ public class TrackDAO {
                 .build();
     }
 
+    public Response addTrackToPlaylist(String token, int playlistId, TrackDTO track) {
+        Response response;
+        playlistsDAO.initConnection();
+        if(playlistsDAO.isOwner(token, playlistId)) {
+
+        } else {
+            response = Response
+                    .status(Response.Status.UNAUTHORIZED)
+                    .build();
+        }
+        playlistsDAO.closeConnection();
+        return response;
+    }
+
     public Response deleteTrackFromPlaylist(String token, int playlistId, int trackId) throws SQLException {
-        Response response = null;
+        Response response;
         playlistsDAO.initConnection();
         if(playlistsDAO.isOwner(token, playlistId)) {
             queryDeleteTrackFromPlaylist(playlistId, trackId);

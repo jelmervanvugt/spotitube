@@ -3,6 +3,7 @@ package nl.han.ica.dea.controllers;
 import nl.han.ica.dea.dao.PlaylistsDAO;
 import nl.han.ica.dea.dao.TrackDAO;
 import nl.han.ica.dea.dto.PlaylistDTO;
+import nl.han.ica.dea.dto.TrackDTO;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -15,6 +16,22 @@ public class PlaylistController {
 
     private PlaylistsDAO playlistsDAO;
     private TrackDAO trackDAO;
+
+    @POST
+    @Path("/{id}/tracks")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addTrackToPlaylist(@QueryParam("token") String token, @PathParam("id") int playlistId, TrackDTO track) {
+        Response response = null;
+        trackDAO.initConnection();
+        try {
+           response = trackDAO.addTrackToPlaylist(token, playlistId, track);
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        trackDAO.closeConnection();
+        return response;
+    }
 
     @DELETE
     @Path("/{playlistId}/tracks/{trackId}")
