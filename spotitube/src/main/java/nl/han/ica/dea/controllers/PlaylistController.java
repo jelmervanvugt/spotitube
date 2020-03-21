@@ -1,6 +1,7 @@
 package nl.han.ica.dea.controllers;
 
 import nl.han.ica.dea.dao.PlaylistsDAO;
+import nl.han.ica.dea.dao.TrackDAO;
 import nl.han.ica.dea.dto.PlaylistDTO;
 
 import javax.inject.Inject;
@@ -13,6 +14,25 @@ import java.sql.SQLException;
 public class PlaylistController {
 
     private PlaylistsDAO playlistsDAO;
+    private TrackDAO trackDAO;
+
+    @GET
+    @Path("/{forPlaylist}/tracks")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTracksFromPlaylist(@PathParam("forPlaylist") int playlistId, @QueryParam("token") String token) {
+        Response response = null;
+        trackDAO.initConnection();
+        try {
+            response = trackDAO.getTracksFromPlaylist(playlistId);
+        } catch(SQLException e) {
+            response = Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .build();
+            e.printStackTrace();
+        }
+        trackDAO.closeConnection();
+        return response;
+    }
 
     @PUT
     @Path("/{id}")
@@ -87,8 +107,11 @@ public class PlaylistController {
     }
 
     @Inject
-    private void setPlaylistsDAO(PlaylistsDAO playlistsDAO) {
-        this.playlistsDAO = playlistsDAO;
+    private void setPlaylistsDAO(PlaylistsDAO playlistsDAO) { this.playlistsDAO = playlistsDAO; }
+
+    @Inject
+    private void setTrackDAO(TrackDAO trackDAO) {
+        this.trackDAO = trackDAO;
     }
 
 }

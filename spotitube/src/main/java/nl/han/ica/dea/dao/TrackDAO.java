@@ -2,6 +2,7 @@ package nl.han.ica.dea.dao;
 
 import nl.han.ica.dea.database.util.DatabaseProperties;
 import nl.han.ica.dea.dto.TrackDTO;
+import nl.han.ica.dea.dto.TracksDTO;
 
 import javax.ws.rs.core.Response;
 import java.sql.*;
@@ -18,7 +19,7 @@ public class TrackDAO {
         queryGetTracksFromPlaylist(playlistId);
         return response = Response
                 .status(Response.Status.OK)
-                .entity(procesTracksFromPlaylist())
+                .entity(new TracksDTO(procesTracksFromPlaylist()))
                 .build();
     }
 
