@@ -4,12 +4,14 @@ import nl.han.ica.dea.database.util.DatabaseProperties;
 import nl.han.ica.dea.dto.TrackDTO;
 import nl.han.ica.dea.dto.TracksDTO;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import java.sql.*;
 import java.util.ArrayList;
 
 public class TrackDAO {
 
+    private PlaylistsDAO playlistsDAO;
     private Connection connection = null;
     private DatabaseProperties dbp = new DatabaseProperties();
     private ResultSet rs;
@@ -21,6 +23,25 @@ public class TrackDAO {
                 .status(Response.Status.OK)
                 .entity(new TracksDTO(procesTracksFromPlaylist()))
                 .build();
+    }
+
+    public Response deleteTrackFromPlaylist(String token, int playlistId, int trackId) throws SQLException {
+        Response response = null;
+        playlistsDAO.initConnection();
+        if(playlistsDAO.isOwner(token, playlistId)) {
+            queryDeleteTrackFromPlaylist(playlistId, trackId);
+            queryGetTracksFromPlaylist(playlistId);
+            response = Response
+                    .status(Response.Status.OK)
+                    .entity(new TracksDTO(procesTracksFromPlaylist()))
+                    .build();
+        } else {
+            response = Response
+                    .status(Response.Status.UNAUTHORIZED)
+                    .build();
+        }
+        playlistsDAO.closeConnection();
+        return response;
     }
 
     public void closeConnection() {
@@ -40,9 +61,14 @@ public class TrackDAO {
         }
     }
 
-    public void queryGetTracksFromPlaylist(int playlistId) throws SQLException {
+    private void queryGetTracksFromPlaylist(int playlistId) throws SQLException {
         Statement stmt = connection.createStatement();
         rs = stmt.executeQuery("call getTracksFromPlaylist(" + playlistId + ");");
+    }
+
+    private void queryDeleteTrackFromPlaylist(int playlistId, int trackId) throws SQLException {
+        Statement stmt = connection.createStatement();
+        stmt.executeUpdate("call deleteTrackFromPlaylist(" + playlistId + ", " + trackId + ");");
     }
 
     private ArrayList<TrackDTO> procesTracksFromPlaylist() throws SQLException {
@@ -61,6 +87,11 @@ public class TrackDAO {
             ));
         }
         return tracks;
+    }
+
+    @Inject
+    private void setPlaylistsDAO(PlaylistsDAO playlistsDAO) {
+       this.playlistsDAO = playlistsDAO;
     }
 
 }

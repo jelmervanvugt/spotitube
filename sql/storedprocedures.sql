@@ -164,10 +164,25 @@ create procedure getTracksFromPlaylist (
 in 		playlistid		 					int
 )
 begin
-			select t.id, t.title, t.performer, t.duration, t.album, t.playcount, t.publicationDate, t.description, t.offlineAvailable
-            from track t, playlistsong ps
+			select t.id, t.title, p.name as performer, t.duration, t.album, t.playcount, t.publicationDate, t.description, t.offlineAvailable
+            from track t, playlistsong ps, performer p
             where ps.playlistid = playlistid
-            and ps.trackid = t.id;
+            and ps.trackid = t.id
+            and t.performer = p.id;
+end //
+delimiter ;
+
+/* delete track van playlist */
+delimiter //
+drop procedure if exists deleteTrackFromPlaylist //
+create procedure deleteTrackFromPlaylist (
+in 		playlistid		 					int,
+in 		trackid		 					int
+)
+begin
+			delete from playlistsong ps
+            where ps.playlistid = playlistid
+            and ps.trackid = trackid;
 end //
 delimiter ;
 

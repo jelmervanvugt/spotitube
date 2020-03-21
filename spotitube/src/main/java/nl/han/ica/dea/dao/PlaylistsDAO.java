@@ -83,20 +83,20 @@ public class PlaylistsDAO {
 
     private void queryEditPlaylistName(PlaylistDTO playlist) throws SQLException {
         Statement stmt = connection.createStatement();
-        stmt.executeQuery("call editPlaylistName(" + playlist.getId() + ", \"" + playlist.getName() + "\");");
+        stmt.executeUpdate("call editPlaylistName(" + playlist.getId() + ", \"" + playlist.getName() + "\");");
     }
 
     private void queryAddPlaylist(String token, PlaylistDTO playlistDTO) throws SQLException {
         Statement stmt = connection.createStatement();
-        stmt.executeQuery("call addPlaylist(\"" + token + "\", \"" + playlistDTO.getName() + "\");");
+        stmt.executeUpdate("call addPlaylist(\"" + token + "\", \"" + playlistDTO.getName() + "\");");
     }
 
     private void queryDeletePlaylist(int id) throws SQLException {
         Statement stmt = connection.createStatement();
-        rs = stmt.executeQuery("call deletePlaylist(" + id + ");");
+        stmt.executeUpdate("call deletePlaylist(" + id + ");");
     }
 
-    private boolean isOwner(String token, int id) throws SQLException {
+    public boolean isOwner(String token, int id) throws SQLException {
         boolean isOwner = false;
         Statement stmt = connection.createStatement();
         rs = stmt.executeQuery("call doesUserOwnPlaylist(\"" + token + "\", " + id + ");");

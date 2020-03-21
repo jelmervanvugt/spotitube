@@ -16,6 +16,21 @@ public class PlaylistController {
     private PlaylistsDAO playlistsDAO;
     private TrackDAO trackDAO;
 
+    @DELETE
+    @Path("/{playlistId}/tracks/{trackId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteTrackFromPlaylist(@QueryParam("token") String token, @PathParam("playlistId") int playlistId, @PathParam("trackId") int trackId) {
+        Response response = null;
+        trackDAO.initConnection();
+        try {
+            response = trackDAO.deleteTrackFromPlaylist(token, playlistId, trackId);
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        trackDAO.closeConnection();
+        return response;
+    }
+
     @GET
     @Path("/{forPlaylist}/tracks")
     @Produces(MediaType.APPLICATION_JSON)
