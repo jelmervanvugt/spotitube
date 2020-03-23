@@ -6,7 +6,7 @@ create table user (
 id									int							not null auto_increment,
 fullname						varchar(250)		not null,
 user							varchar(50)			not null,
-password					varchar(50)			not null,
+password					varchar(64)			not null,
 token							varchar(14)			null,
 
 unique(user),

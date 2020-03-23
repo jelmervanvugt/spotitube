@@ -1,8 +1,7 @@
 use spotitube;
 
 insert into user(fullname, user, password, token) values
-("Jelmer van Vugt", "jelmo", "jelmo01", "token1"),
-("Jelmer van Vugt2", "jelmo2", "jelmo02", "token2");
+("Jelmer van Vugt", "jelmo", "dc00c903852bb19eb250aeba05e534a6d211629d77d055033806b783bae09937", "testtoken");
 
 insert into performer(id, name) values
 (1, "TestPerformer1"),
@@ -26,8 +25,7 @@ insert into playlist(name) values
 
 insert into userplaylist(userid, playlistid, isowner) values
 (1, 1, true),
-(2, 2, true),
-(1, 2, false);
+(1, 2, true);
 
 insert into playlistsong(playlistid, trackid) values
 (1, 1),

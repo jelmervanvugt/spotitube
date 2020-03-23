@@ -5,7 +5,7 @@ delimiter //
 drop procedure if exists doesUserExist //
 create procedure doesUserExist (
 in 		user		 		varchar(50), 
-in 		password 	varchar(50)
+in 		password 	varchar(64)
 )
 begin
 
@@ -21,16 +21,12 @@ delimiter ;
 delimiter //
 drop procedure if exists getUser //
 create procedure getUser (
-in 		user		 		varchar(50), 
-in 		password 	varchar(50)
+in 		user		 		varchar(50)
 )
 begin
-            
             select *
             from user u 
-            where u.user = user
-            and u.password = password;
-		
+            where u.user = user;
 end //
 delimiter ;
 
@@ -70,8 +66,7 @@ delimiter ;
 delimiter //
 drop procedure if exists generateToken //
 create procedure generateToken (
-in 		user		 		varchar(50), 
-in 		password 	varchar(50)
+in 		user		 		varchar(50)
 )
 begin
                     update user u set token = concat(
