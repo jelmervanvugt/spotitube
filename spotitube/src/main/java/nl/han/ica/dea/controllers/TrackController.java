@@ -14,9 +14,8 @@ public class TrackController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTracksFromPlaylist(@QueryParam("token") String token, @QueryParam("forPlaylist") int playlistId) {
-        return trackService.getTracksNotInPlaylist(playlistId);
-    }
+    public Response getTracksFromPlaylist(@QueryParam("token") String token, @QueryParam("forPlaylist") int playlistId)
+    { return trackService.getTracksNotInPlaylist(playlistId); }
 
     @Inject
     private void setTrackService(TrackService trackService) {

@@ -39,7 +39,7 @@ public class PlaylistDAO {
             response = Response
                     .status(Response.Status.BAD_REQUEST)
                     .build();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return response;
@@ -54,7 +54,7 @@ public class PlaylistDAO {
                     .entity(getAllPlaylists(token))
                     .build();
             return response;
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             response = Response
                     .status(Response.Status.BAD_REQUEST)
@@ -77,7 +77,7 @@ public class PlaylistDAO {
                         .status(Response.Status.UNAUTHORIZED)
                         .build();
             }
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return response;
@@ -140,7 +140,8 @@ public class PlaylistDAO {
         var sql = "call getAllPlaylists(?);";
         var stmt = connection.prepareStatement(sql);
         stmt.setString(1, token);
-        return stmt.executeQuery();
+        ResultSet rs = stmt.executeQuery();
+        return rs;
     }
 
     private int getPlaylistsLength(ArrayList<PlaylistDTO> playlists) throws SQLException {
@@ -164,6 +165,7 @@ public class PlaylistDAO {
     }
 
     @Inject
-    private void setPlaylistsDataMapper(PlaylistsDataMapper playlistsDataMapper) {this.playlistsDataMapper = playlistsDataMapper;}
-
+    private void setPlaylistsDataMapper(PlaylistsDataMapper playlistsDataMapper) {
+        this.playlistsDataMapper = playlistsDataMapper;
+    }
 }

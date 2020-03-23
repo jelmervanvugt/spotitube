@@ -28,6 +28,7 @@ public class LoginDAO {
                         .build();
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             System.out.println("Foutmelding in LoginDAO");
         }
         return response;

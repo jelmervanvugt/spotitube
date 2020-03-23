@@ -137,14 +137,16 @@ public class TrackDAO {
         var sql = "call getTracksFromPlaylist(?);";
         var stmt = connection.prepareStatement(sql);
         stmt.setInt(1, playlistId);
-        return tracksDataMapper.mapToDTO(stmt.executeQuery());
+        TracksDTO tracks = tracksDataMapper.mapToDTO(stmt.executeQuery());
+        return tracks;
     }
 
     private TracksDTO getAllTracksNotInPlaylist(int playlistId) throws SQLException {
         var sql = "call getAllTracksNotInPlaylist(?);";
         var stmt = connection.prepareStatement(sql);
         stmt.setInt(1, playlistId);
-        return tracksDataMapper.mapToDTO(stmt.executeQuery());
+        TracksDTO tracks = tracksDataMapper.mapToDTO(stmt.executeQuery());
+        return tracks;
     }
 
     private void queryDeleteTrackFromPlaylist(int playlistId, int trackId) throws SQLException {
