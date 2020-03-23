@@ -1,7 +1,11 @@
 package nl.han.ica.dea.dao;
 
 import nl.han.ica.dea.database.util.DatabaseProperties;
+import nl.han.ica.dea.datamappers.LoginResponseDataMapper;
+import nl.han.ica.dea.dto.LoginDTO;
 
+import javax.inject.Inject;
+import javax.ws.rs.core.Response;
 import java.sql.*;
 
 public class LoginDAO {
@@ -9,57 +13,37 @@ public class LoginDAO {
     private Connection connection = null;
     private DatabaseProperties dbp = new DatabaseProperties();
     private ResultSet rs;
+    private LoginResponseDataMapper loginResponseDataMapper;
 
-    public boolean checkCredentials(String user, String password) {
+    public Response checkCredentials(LoginDTO loginDTO) {
+        Response response = null;
         try {
-            queryDb(user, password);
-            if (procesResults() != 1) {
-                return false;
+            if (doesUserExist(loginDTO)) {
+                generateToken(loginDTO);
+                getUser(loginDTO);
+                return response = Response.status(Response.Status.OK).entity(loginResponseDataMapper.mapToDTO(rs)).build();
+            } else {
+                response = Response
+                        .status(Response.Status.UNAUTHORIZED)
+                        .build();
             }
-            generateToken(user, password);
         } catch (SQLException e) {
             System.out.println("Foutmelding in LoginDAO");
         }
-        return true;
+        return response;
     }
 
     public void closeConnection() {
         try {
             connection.close();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
-    public String getToken(String user, String password) {
-        String token = null;
-        try {
-            Statement stmt = connection.createStatement();
-            rs = stmt.executeQuery("call getUser(\"" + user + "\", \"" + password + "\");");
-
-            while (rs.next()) {
-               token = rs.getString("token");
-            }
-        } catch(SQLException e) {
-            System.out.println("Foutmelding in LoginDAO");
-        }
-        return token;
-    }
-
-    public String getFullName(String user, String password) {
-        String fullName = null;
-        try {
-            Statement stmt = connection.createStatement();
-            rs = stmt.executeQuery("call getUser(\"" + user + "\", \"" + password + "\");");
-
-            while (rs.next()) {
-                fullName = rs.getString("fullname");
-            }
-        } catch(SQLException e) {
-            System.out.println("Foutmelding in LoginDAO");
-        }
-        return fullName;
+    private void getUser(LoginDTO loginDTO) throws SQLException {
+        Statement stmt = connection.createStatement();
+        rs = stmt.executeQuery("call getUser(\"" + loginDTO.getUser() + "\", \"" + loginDTO.getPassword() + "\");");
     }
 
     public void initConnection() {
@@ -71,9 +55,10 @@ public class LoginDAO {
         }
     }
 
-    private void queryDb(String user, String password) throws SQLException {
+    private boolean doesUserExist(LoginDTO loginDTO) throws SQLException {
         Statement stmt = connection.createStatement();
-        rs = stmt.executeQuery("call doesUserExist(\"" + user + "\", \"" + password + "\");");
+        rs = stmt.executeQuery("call doesUserExist(\"" + loginDTO.getUser() + "\", \"" + loginDTO.getPassword() + "\");");
+        return procesResults() == 1;
     }
 
     private int procesResults() throws SQLException {
@@ -84,9 +69,14 @@ public class LoginDAO {
         return nResults;
     }
 
-    private void generateToken(String user, String password) throws SQLException {
+    private void generateToken(LoginDTO loginDTO) throws SQLException {
         Statement stmt = connection.createStatement();
-        stmt.executeUpdate("call generateToken(\"" + user + "\", \"" + password + "\");");
+        stmt.executeUpdate("call generateToken(\"" + loginDTO.getUser() + "\", \"" + loginDTO.getPassword() + "\");");
+    }
+
+    @Inject
+    private void setLoginResponseDataMapper(LoginResponseDataMapper loginResponseDataMapper) {
+        this.loginResponseDataMapper = loginResponseDataMapper;
     }
 
 }

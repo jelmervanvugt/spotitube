@@ -1,9 +1,11 @@
 package nl.han.ica.dea.dao;
 
 import nl.han.ica.dea.database.util.DatabaseProperties;
+import nl.han.ica.dea.datamappers.PlaylistsDataMapper;
 import nl.han.ica.dea.dto.PlaylistDTO;
 import nl.han.ica.dea.dto.PlaylistsDTO;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,12 +14,13 @@ public class PlaylistsDAO {
 
     private Connection connection = null;
     private DatabaseProperties dbp = new DatabaseProperties();
+    private PlaylistsDataMapper playlistsDataMapper;
     private ResultSet rs;
 
     public PlaylistsDTO getAllPlaylists(String token) throws SQLException {
         PlaylistsDTO playlistsDTO;
         rs = queryPlaylistInfo(token);
-        ArrayList<PlaylistDTO> playlists = getPlaylistInfo();
+        ArrayList<PlaylistDTO> playlists = playlistsDataMapper.mapToDTO(rs);
         int playlistLength = getPlaylistsLength(playlists);
         playlistsDTO = new PlaylistsDTO(playlists, playlistLength);
         return playlistsDTO;
@@ -111,17 +114,6 @@ public class PlaylistsDAO {
         return stmt.executeQuery("call getAllPlaylists(\"" + token + "\");");
     }
 
-    private ArrayList<PlaylistDTO> getPlaylistInfo() throws SQLException {
-        ArrayList<PlaylistDTO> playlists = new ArrayList<>();
-        while (rs.next()) {
-            playlists.add(new PlaylistDTO(
-                    rs.getInt("id"),
-                    rs.getString("name"),
-                    rs.getBoolean("isowner")));
-        }
-        return playlists;
-    }
-
     private int getPlaylistsLength(ArrayList<PlaylistDTO> playlists) throws SQLException {
         int playlistsLength = 0;
         for (PlaylistDTO playlist : playlists) {
@@ -139,5 +131,8 @@ public class PlaylistsDAO {
         }
         return length;
     }
+
+    @Inject
+    private void setPlaylistsDataMapper(PlaylistsDataMapper playlistsDataMapper) {this.playlistsDataMapper = playlistsDataMapper;}
 
 }
