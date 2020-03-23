@@ -10,7 +10,7 @@ import javax.ws.rs.core.Response;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class PlaylistsDAO {
+public class PlaylistDAO {
 
     private Connection connection = null;
     private DatabaseProperties dbp = new DatabaseProperties();

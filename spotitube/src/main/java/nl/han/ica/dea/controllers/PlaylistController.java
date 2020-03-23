@@ -1,6 +1,6 @@
 package nl.han.ica.dea.controllers;
 
-import nl.han.ica.dea.dao.PlaylistsDAO;
+import nl.han.ica.dea.dao.PlaylistDAO;
 import nl.han.ica.dea.dao.TrackDAO;
 import nl.han.ica.dea.dto.PlaylistDTO;
 import nl.han.ica.dea.dto.TrackDTO;
@@ -14,7 +14,7 @@ import java.sql.SQLException;
 @Path("playlists")
 public class PlaylistController {
 
-    private PlaylistsDAO playlistsDAO;
+    private PlaylistDAO playlistDAO;
     private TrackDAO trackDAO;
 
     @POST
@@ -57,9 +57,9 @@ public class PlaylistController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response editPlaylist(PlaylistDTO playlist, @PathParam("id") int id, @QueryParam("token") String token) {
         Response response;
-        playlistsDAO.initConnection();
-        response = playlistsDAO.editPlaylistName(token, playlist);
-        playlistsDAO.closeConnection();
+        playlistDAO.initConnection();
+        response = playlistDAO.editPlaylistName(token, playlist);
+        playlistDAO.closeConnection();
         return response;
     }
 
@@ -68,9 +68,9 @@ public class PlaylistController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response addPlaylist(PlaylistDTO playlist, @QueryParam("token") String token) {
         Response response;
-        playlistsDAO.initConnection();
-        response = playlistsDAO.addPlaylist(token, playlist);
-        playlistsDAO.closeConnection();
+        playlistDAO.initConnection();
+        response = playlistDAO.addPlaylist(token, playlist);
+        playlistDAO.closeConnection();
         return response;
     }
 
@@ -79,9 +79,9 @@ public class PlaylistController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deletePlaylist(@PathParam("id") int id, @QueryParam("token") String token) {
         Response response;
-        playlistsDAO.initConnection();
-        response = playlistsDAO.deletePlaylist(token, id);
-        playlistsDAO.closeConnection();
+        playlistDAO.initConnection();
+        response = playlistDAO.deletePlaylist(token, id);
+        playlistDAO.closeConnection();
         return response;
     }
 
@@ -89,11 +89,11 @@ public class PlaylistController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllPlaylists(@QueryParam("token") String token) {
         Response response = null;
-        playlistsDAO.initConnection();
+        playlistDAO.initConnection();
         try {
             response = Response
                     .status(Response.Status.OK)
-                    .entity(playlistsDAO.getAllPlaylists(token))
+                    .entity(playlistDAO.getAllPlaylists(token))
                     .build();
         } catch (SQLException e) {
             response = Response
@@ -101,13 +101,13 @@ public class PlaylistController {
                     .build();
             e.printStackTrace();
         }
-        playlistsDAO.closeConnection();
+        playlistDAO.closeConnection();
         return response;
     }
 
     @Inject
-    private void setPlaylistsDAO(PlaylistsDAO playlistsDAO) {
-        this.playlistsDAO = playlistsDAO;
+    private void setPlaylistDAO(PlaylistDAO playlistDAO) {
+        this.playlistDAO = playlistDAO;
     }
 
     @Inject

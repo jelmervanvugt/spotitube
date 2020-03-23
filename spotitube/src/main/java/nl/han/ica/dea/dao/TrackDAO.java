@@ -8,11 +8,10 @@ import nl.han.ica.dea.dto.TracksDTO;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import java.sql.*;
-import java.util.ArrayList;
 
 public class TrackDAO {
 
-    private PlaylistsDAO playlistsDAO;
+    private PlaylistDAO playlistDAO;
     private Connection connection = null;
     private DatabaseProperties dbp = new DatabaseProperties();
     private ResultSet rs;
@@ -51,9 +50,9 @@ public class TrackDAO {
 
     public Response addTrackToPlaylist(String token, int playlistId, TrackDTO track) {
         Response response = null;
-        playlistsDAO.initConnection();
+        playlistDAO.initConnection();
         try {
-            if (playlistsDAO.isOwner(token, playlistId) && queryDoesPlaylistContainTrack(playlistId, track.getId())) {
+            if (playlistDAO.isOwner(token, playlistId) && queryDoesPlaylistContainTrack(playlistId, track.getId())) {
                 queryAddTrackToPlaylist(playlistId, track);
                 response = Response
                         .status(Response.Status.OK)
@@ -67,15 +66,15 @@ public class TrackDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        playlistsDAO.closeConnection();
+        playlistDAO.closeConnection();
         return response;
     }
 
     public Response deleteTrackFromPlaylist(String token, int playlistId, int trackId) {
         Response response = null;
-        playlistsDAO.initConnection();
+        playlistDAO.initConnection();
         try {
-            if (playlistsDAO.isOwner(token, playlistId)) {
+            if (playlistDAO.isOwner(token, playlistId)) {
                 queryDeleteTrackFromPlaylist(playlistId, trackId);
                 response = Response
                         .status(Response.Status.OK)
@@ -89,7 +88,7 @@ public class TrackDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        playlistsDAO.closeConnection();
+        playlistDAO.closeConnection();
         return response;
     }
 
@@ -157,8 +156,8 @@ public class TrackDAO {
     }
 
     @Inject
-    private void setPlaylistsDAO(PlaylistsDAO playlistsDAO) {
-        this.playlistsDAO = playlistsDAO;
+    private void setPlaylistDAO(PlaylistDAO playlistDAO) {
+        this.playlistDAO = playlistDAO;
     }
 
     @Inject
