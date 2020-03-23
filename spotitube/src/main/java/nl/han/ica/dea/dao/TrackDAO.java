@@ -1,6 +1,7 @@
 package nl.han.ica.dea.dao;
 
 import nl.han.ica.dea.database.util.DatabaseProperties;
+import nl.han.ica.dea.datamappers.TracksDataMapper;
 import nl.han.ica.dea.dto.TrackDTO;
 import nl.han.ica.dea.dto.TracksDTO;
 
@@ -15,22 +16,21 @@ public class TrackDAO {
     private Connection connection = null;
     private DatabaseProperties dbp = new DatabaseProperties();
     private ResultSet rs;
+    private TracksDataMapper tracksDataMapper;
 
     public Response getTracksFromPlaylist(int playlistId) throws SQLException {
         Response response;
-        queryGetTracksFromPlaylist(playlistId);
         return response = Response
                 .status(Response.Status.OK)
-                .entity(new TracksDTO(procesTracksFromPlaylist()))
+                .entity(getAllTracksFromPlaylist(playlistId))
                 .build();
     }
 
     public Response getTracksNotInPlaylist(int playlistId) throws SQLException {
         Response response;
-        queryGetTracksNotInPlaylist(playlistId);
         return response = Response
                 .status(Response.Status.OK)
-                .entity(new TracksDTO(procesTracksFromPlaylist()))
+                .entity(getAllTracksNotInPlaylist(playlistId))
                 .build();
     }
 
@@ -39,10 +39,9 @@ public class TrackDAO {
         playlistsDAO.initConnection();
         if(playlistsDAO.isOwner(token, playlistId) && queryDoesPlaylistContainTrack(playlistId, track.getId())) {
             queryAddTrackToPlaylist(playlistId, track);
-            queryGetTracksFromPlaylist(playlistId);
             response = Response
                     .status(Response.Status.OK)
-                    .entity(new TracksDTO(procesTracksFromPlaylist()))
+                    .entity(getAllTracksFromPlaylist(playlistId))
                     .build();
         } else {
             response = Response
@@ -58,10 +57,9 @@ public class TrackDAO {
         playlistsDAO.initConnection();
         if(playlistsDAO.isOwner(token, playlistId)) {
             queryDeleteTrackFromPlaylist(playlistId, trackId);
-            queryGetTracksFromPlaylist(playlistId);
             response = Response
                     .status(Response.Status.OK)
-                    .entity(new TracksDTO(procesTracksFromPlaylist()))
+                    .entity(getAllTracksFromPlaylist(playlistId))
                     .build();
         } else {
             response = Response
@@ -103,14 +101,14 @@ public class TrackDAO {
         return false;
     }
 
-    private void queryGetTracksFromPlaylist(int playlistId) throws SQLException {
+    private TracksDTO getAllTracksFromPlaylist(int playlistId) throws SQLException {
         Statement stmt = connection.createStatement();
-        rs = stmt.executeQuery("call getTracksFromPlaylist(" + playlistId + ");");
+        return tracksDataMapper.mapToDTO(stmt.executeQuery("call getTracksFromPlaylist(" + playlistId + ");"));
     }
 
-    private void queryGetTracksNotInPlaylist(int playlistId) throws SQLException {
+    private TracksDTO getAllTracksNotInPlaylist(int playlistId) throws SQLException {
         Statement stmt = connection.createStatement();
-        rs = stmt.executeQuery("call getAllTracksNotInPlaylist(" + playlistId + ");");
+        return tracksDataMapper.mapToDTO(stmt.executeQuery("call getAllTracksNotInPlaylist(" + playlistId + ");"));
     }
 
     private void queryDeleteTrackFromPlaylist(int playlistId, int trackId) throws SQLException {
@@ -118,27 +116,14 @@ public class TrackDAO {
         stmt.executeUpdate("call deleteTrackFromPlaylist(" + playlistId + ", " + trackId + ");");
     }
 
-    private ArrayList<TrackDTO> procesTracksFromPlaylist() throws SQLException {
-        ArrayList<TrackDTO> tracks = new ArrayList<>();
-        while (rs.next()) {
-            tracks.add(new TrackDTO(
-                rs.getInt("id"),
-                rs.getString("title"),
-                    rs.getString("performer"),
-                    rs.getInt("duration"),
-                    rs.getString("album"),
-                    rs.getInt("playcount"),
-                    rs.getString("publicationDate"),
-                    rs.getString("description"),
-                    rs.getBoolean("offlineAvailable")
-            ));
-        }
-        return tracks;
-    }
-
     @Inject
     private void setPlaylistsDAO(PlaylistsDAO playlistsDAO) {
        this.playlistsDAO = playlistsDAO;
+    }
+
+    @Inject
+    private void setTracksDataMapper(TracksDataMapper tracksDataMapper) {
+        this.tracksDataMapper = tracksDataMapper;
     }
 
 }
