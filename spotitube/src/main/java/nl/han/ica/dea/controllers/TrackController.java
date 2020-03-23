@@ -16,16 +16,9 @@ public class TrackController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTracksFromPlaylist(@QueryParam("token") String token, @QueryParam("forPlaylist") int playlistId) {
-        Response response = null;
+        Response response;
         trackDAO.initConnection();
-        try {
-            response = trackDAO.getTracksNotInPlaylist(playlistId);
-        } catch(SQLException e) {
-            response = Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .build();
-            e.printStackTrace();
-        }
+        response = trackDAO.getTracksNotInPlaylist(playlistId);
         trackDAO.closeConnection();
         return response;
     }

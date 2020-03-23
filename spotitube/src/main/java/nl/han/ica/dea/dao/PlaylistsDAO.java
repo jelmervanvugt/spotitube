@@ -26,43 +26,59 @@ public class PlaylistsDAO {
         return playlistsDTO;
     }
 
-    public Response deletePlaylist(String token, int id) throws SQLException {
+    public Response deletePlaylist(String token, int id) {
         Response response = null;
-        if (isOwner(token, id)) {
-            queryDeletePlaylist(id);
+        try {
+            if (isOwner(token, id)) {
+                queryDeletePlaylist(id);
+                response = Response
+                        .status(Response.Status.OK)
+                        .entity(getAllPlaylists(token))
+                        .build();
+            }
             response = Response
-                    .status(Response.Status.OK)
-                    .entity(getAllPlaylists(token))
+                    .status(Response.Status.BAD_REQUEST)
                     .build();
+        } catch(SQLException e) {
+            e.printStackTrace();
         }
-        response = Response
-                .status(Response.Status.BAD_REQUEST)
-                .build();
         return response;
     }
 
-    public Response addPlaylist(String token, PlaylistDTO playlistDTO) throws SQLException {
+    public Response addPlaylist(String token, PlaylistDTO playlistDTO) {
         Response response = null;
-        queryAddPlaylist(token, playlistDTO);
-        response = Response
+        try {
+            queryAddPlaylist(token, playlistDTO);
+            response = Response
                     .status(Response.Status.CREATED)
                     .entity(getAllPlaylists(token))
                     .build();
+            return response;
+        } catch(SQLException e) {
+            e.printStackTrace();
+            response = Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .build();
+        }
         return response;
     }
 
-    public Response editPlaylistName(String token, PlaylistDTO playlist) throws SQLException {
+    public Response editPlaylistName(String token, PlaylistDTO playlist) {
         Response response = null;
-        if(isOwner(token, playlist.getId())) {
-            queryEditPlaylistName(playlist);
-            response = Response
-                    .status(Response.Status.OK)
-                    .entity(getAllPlaylists(token))
-                    .build();
-        } else {
-            response = Response
-                    .status(Response.Status.UNAUTHORIZED)
-                    .build();
+        try {
+            if (isOwner(token, playlist.getId())) {
+                queryEditPlaylistName(playlist);
+                response = Response
+                        .status(Response.Status.OK)
+                        .entity(getAllPlaylists(token))
+                        .build();
+            } else {
+                response = Response
+                        .status(Response.Status.UNAUTHORIZED)
+                        .build();
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
         }
         return response;
     }
