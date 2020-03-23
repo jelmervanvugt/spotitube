@@ -101,24 +101,35 @@ public class PlaylistsDAO {
     }
 
     private void queryEditPlaylistName(PlaylistDTO playlist) throws SQLException {
-        Statement stmt = connection.createStatement();
-        stmt.executeUpdate("call editPlaylistName(" + playlist.getId() + ", \"" + playlist.getName() + "\");");
+        var sql = "call editPlaylistName(?, ?);";
+        var stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, playlist.getId());
+        stmt.setString(2, playlist.getName());
+        stmt.executeUpdate();
     }
 
     private void queryAddPlaylist(String token, PlaylistDTO playlistDTO) throws SQLException {
-        Statement stmt = connection.createStatement();
-        stmt.executeUpdate("call addPlaylist(\"" + token + "\", \"" + playlistDTO.getName() + "\");");
+        var sql = "call addPlaylist(?, ?);";
+        var stmt = connection.prepareStatement(sql);
+        stmt.setString(1, token);
+        stmt.setString(2, playlistDTO.getName());
+        stmt.executeUpdate();
     }
 
     private void queryDeletePlaylist(int id) throws SQLException {
-        Statement stmt = connection.createStatement();
-        stmt.executeUpdate("call deletePlaylist(" + id + ");");
+        var sql = "call deletePlaylist(?);";
+        var stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, id);
+        stmt.executeUpdate();
     }
 
     public boolean isOwner(String token, int id) throws SQLException {
         boolean isOwner = false;
-        Statement stmt = connection.createStatement();
-        rs = stmt.executeQuery("call doesUserOwnPlaylist(\"" + token + "\", " + id + ");");
+        var sql = "call doesUserOwnPlaylist(?, ?);";
+        var stmt = connection.prepareStatement(sql);
+        stmt.setString(1, token);
+        stmt.setInt(2, id);
+        rs = stmt.executeQuery();
         while (rs.next()) {
             isOwner = rs.getBoolean("isOwner");
         }
@@ -126,8 +137,10 @@ public class PlaylistsDAO {
     }
 
     private ResultSet queryPlaylistInfo(String token) throws SQLException {
-        Statement stmt = connection.createStatement();
-        return stmt.executeQuery("call getAllPlaylists(\"" + token + "\");");
+        var sql = "call getAllPlaylists(?);";
+        var stmt = connection.prepareStatement(sql);
+        stmt.setString(1, token);
+        return stmt.executeQuery();
     }
 
     private int getPlaylistsLength(ArrayList<PlaylistDTO> playlists) throws SQLException {
@@ -140,8 +153,10 @@ public class PlaylistsDAO {
 
     private int getPlaylistLength(PlaylistDTO playlistDTO) throws SQLException {
         int length = 0;
-        Statement stmt = connection.createStatement();
-        rs = stmt.executeQuery("call getPlaylistLength(\"" + playlistDTO.getId() + "\");");
+        var sql = "call getPlaylistLength(?);";
+        var stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, playlistDTO.getId());
+        rs = stmt.executeQuery();
         while (rs.next()) {
             length = rs.getInt("playlistlength");
         }

@@ -42,8 +42,11 @@ public class LoginDAO {
     }
 
     private void getUser(LoginDTO loginDTO) throws SQLException {
-        Statement stmt = connection.createStatement();
-        rs = stmt.executeQuery("call getUser(\"" + loginDTO.getUser() + "\", \"" + loginDTO.getPassword() + "\");");
+        var sql = "call getUser(?, ?);";
+        var stmt = connection.prepareStatement(sql);
+        stmt.setString(1, loginDTO.getUser());
+        stmt.setString(2, loginDTO.getPassword());
+        rs = stmt.executeQuery();
     }
 
     public void initConnection() {
@@ -56,8 +59,11 @@ public class LoginDAO {
     }
 
     private boolean doesUserExist(LoginDTO loginDTO) throws SQLException {
-        Statement stmt = connection.createStatement();
-        rs = stmt.executeQuery("call doesUserExist(\"" + loginDTO.getUser() + "\", \"" + loginDTO.getPassword() + "\");");
+        var sql = "call doesUserExist(?, ?);";
+        var stmt = connection.prepareStatement(sql);
+        stmt.setString(1, loginDTO.getUser());
+        stmt.setString(2, loginDTO.getPassword());
+        rs = stmt.executeQuery();
         return procesResults() == 1;
     }
 
@@ -70,8 +76,11 @@ public class LoginDAO {
     }
 
     private void generateToken(LoginDTO loginDTO) throws SQLException {
-        Statement stmt = connection.createStatement();
-        stmt.executeUpdate("call generateToken(\"" + loginDTO.getUser() + "\", \"" + loginDTO.getPassword() + "\");");
+        var sql = "call generateToken(?, ?);";
+        var stmt = connection.prepareStatement(sql);
+        stmt.setString(1, loginDTO.getUser());
+        stmt.setString(2, loginDTO.getPassword());
+        stmt.executeUpdate();
     }
 
     @Inject

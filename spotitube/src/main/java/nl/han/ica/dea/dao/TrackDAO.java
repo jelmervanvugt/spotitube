@@ -111,13 +111,21 @@ public class TrackDAO {
     }
 
     private void queryAddTrackToPlaylist(int playlistId, TrackDTO track) throws SQLException {
-        Statement stmt = connection.createStatement();
-        stmt.executeUpdate("call addTrackToPlaylist(" + playlistId + ", " + track.getId() + ", " + track.getOfflineAvailable() + ");");
+        var sql = "call addTrackToPlaylist(?, ?, ?);";
+        var stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, playlistId);
+        stmt.setInt(2, track.getId());
+        stmt.setBoolean(3, track.getOfflineAvailable());
+        stmt.executeUpdate();
     }
 
     private boolean queryDoesPlaylistContainTrack(int playlistId, int trackId) throws SQLException {
-        Statement stmt = connection.createStatement();
-        rs = stmt.executeQuery("call doesPlaylistContainTrack(" + playlistId + ", " + trackId + ");");
+        var sql = "call doesPlaylistContainTrack(?, ?);";
+        var stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, playlistId);
+        stmt.setInt(2, trackId);
+        rs = stmt.executeQuery();
+
         while (rs.next()) {
             if (rs.getInt("nResults") == 0) {
                 return true;
@@ -127,18 +135,25 @@ public class TrackDAO {
     }
 
     private TracksDTO getAllTracksFromPlaylist(int playlistId) throws SQLException {
-        Statement stmt = connection.createStatement();
-        return tracksDataMapper.mapToDTO(stmt.executeQuery("call getTracksFromPlaylist(" + playlistId + ");"));
+        var sql = "call getTracksFromPlaylist(?);";
+        var stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, playlistId);
+        return tracksDataMapper.mapToDTO(stmt.executeQuery());
     }
 
     private TracksDTO getAllTracksNotInPlaylist(int playlistId) throws SQLException {
-        Statement stmt = connection.createStatement();
-        return tracksDataMapper.mapToDTO(stmt.executeQuery("call getAllTracksNotInPlaylist(" + playlistId + ");"));
+        var sql = "call getAllTracksNotInPlaylist(?);";
+        var stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, playlistId);
+        return tracksDataMapper.mapToDTO(stmt.executeQuery());
     }
 
     private void queryDeleteTrackFromPlaylist(int playlistId, int trackId) throws SQLException {
-        Statement stmt = connection.createStatement();
-        stmt.executeUpdate("call deleteTrackFromPlaylist(" + playlistId + ", " + trackId + ");");
+        var sql = "call deleteTrackFromPlaylist(?, ?);";
+        var stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, playlistId);
+        stmt.setInt(2, trackId);
+        stmt.executeUpdate();
     }
 
     @Inject
