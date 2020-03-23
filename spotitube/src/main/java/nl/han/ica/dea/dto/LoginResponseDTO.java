@@ -4,9 +4,7 @@ public class LoginResponseDTO {
 
     private String token, user;
 
-    public LoginResponseDTO() {
-        //
-    }
+    public LoginResponseDTO() {}
 
     public LoginResponseDTO(String user, String token) {
 

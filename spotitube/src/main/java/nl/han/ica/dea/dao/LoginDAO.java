@@ -3,9 +3,11 @@ package nl.han.ica.dea.dao;
 import nl.han.ica.dea.database.util.DatabaseProperties;
 import nl.han.ica.dea.datamappers.LoginResponseDataMapper;
 import nl.han.ica.dea.dto.LoginDTO;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 
 public class LoginDAO {
@@ -27,9 +29,8 @@ public class LoginDAO {
                         .status(Response.Status.UNAUTHORIZED)
                         .build();
             }
-        } catch (SQLException e) {
+        } catch (SQLException | NoSuchAlgorithmException e) {
             e.printStackTrace();
-            System.out.println("Foutmelding in LoginDAO");
         }
         return response;
     }
@@ -43,10 +44,9 @@ public class LoginDAO {
     }
 
     private void getUser(LoginDTO loginDTO) throws SQLException {
-        var sql = "call getUser(?, ?);";
+        var sql = "call getUser(?);";
         var stmt = connection.prepareStatement(sql);
         stmt.setString(1, loginDTO.getUser());
-        stmt.setString(2, loginDTO.getPassword());
         rs = stmt.executeQuery();
     }
 
@@ -59,11 +59,11 @@ public class LoginDAO {
         }
     }
 
-    private boolean doesUserExist(LoginDTO loginDTO) throws SQLException {
+    private boolean doesUserExist(LoginDTO loginDTO) throws SQLException, NoSuchAlgorithmException {
         var sql = "call doesUserExist(?, ?);";
         var stmt = connection.prepareStatement(sql);
         stmt.setString(1, loginDTO.getUser());
-        stmt.setString(2, loginDTO.getPassword());
+        stmt.setString(2, stringToHash(loginDTO.getPassword()));
         rs = stmt.executeQuery();
         return procesResults() == 1;
     }
@@ -77,11 +77,14 @@ public class LoginDAO {
     }
 
     private void generateToken(LoginDTO loginDTO) throws SQLException {
-        var sql = "call generateToken(?, ?);";
+        var sql = "call generateToken(?);";
         var stmt = connection.prepareStatement(sql);
         stmt.setString(1, loginDTO.getUser());
-        stmt.setString(2, loginDTO.getPassword());
         stmt.executeUpdate();
+    }
+
+    private String stringToHash(String string) throws NoSuchAlgorithmException {
+        return DigestUtils.sha256Hex(string);
     }
 
     @Inject

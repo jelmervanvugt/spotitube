@@ -7,9 +7,7 @@ public class PlaylistsDTO {
     private ArrayList<PlaylistDTO> playlists;
     private int length;
 
-    public PlaylistsDTO() {
-        //nvt
-    }
+    public PlaylistsDTO() {}
 
     public PlaylistsDTO(ArrayList<PlaylistDTO> playlists, int length) {
         this.playlists = playlists;

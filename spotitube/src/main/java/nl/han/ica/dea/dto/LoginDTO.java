@@ -4,9 +4,7 @@ public class LoginDTO {
 
     private String user, password;
 
-    public LoginDTO() {
-        //nvt
-    }
+    public LoginDTO() {}
 
     public LoginDTO(String user, String password) {
         this.user = user;

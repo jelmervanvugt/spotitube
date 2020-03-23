@@ -6,9 +6,7 @@ public class TrackDTO {
     private String title, performer, album, publicationDate, description;
     private boolean offlineAvailable;
 
-    public TrackDTO() {
-        //nvt
-    }
+    public TrackDTO() {}
 
     public TrackDTO(int id,
                     String title,

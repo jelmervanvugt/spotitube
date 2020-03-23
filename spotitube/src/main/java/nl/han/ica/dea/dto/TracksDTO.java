@@ -6,9 +6,7 @@ public class TracksDTO {
 
     private ArrayList<TrackDTO> tracks = new ArrayList<>();
 
-    public TracksDTO() {
-        //
-    }
+    public TracksDTO() {}
 
     public TracksDTO(ArrayList<TrackDTO> tracks) {
         this.tracks = tracks;
