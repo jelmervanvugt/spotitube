@@ -11,7 +11,7 @@ public class LoginService {
     private LoginDAO loginDAO;
 
     public Response checkCredentials(LoginDTO loginDTO) {
-       Response response = null;
+       Response response;
        loginDAO.initConnection();
        response = loginDAO.checkCredentials(loginDTO);
        loginDAO.closeConnection();
