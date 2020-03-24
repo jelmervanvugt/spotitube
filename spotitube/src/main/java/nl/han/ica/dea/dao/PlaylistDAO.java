@@ -6,6 +6,7 @@ import nl.han.ica.dea.dto.PlaylistsDTO;
 import nl.han.ica.dea.services.ConnectionService;
 
 import javax.inject.Inject;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import java.sql.*;
 import java.util.ArrayList;
@@ -26,21 +27,17 @@ public class PlaylistDAO {
     }
 
     public Response deletePlaylist(String token, int id) {
-        connectionService.initConnection();
         Response response = null;
+        connectionService.initConnection();
         try {
-            if (isOwner(token, id)) {
-                queryDeletePlaylist(id);
-                response = Response
-                        .status(Response.Status.OK)
-                        .entity(getAllPlaylists(token))
-                        .build();
-            }
+            queryDeletePlaylist(id);
             response = Response
-                    .status(Response.Status.BAD_REQUEST)
+                    .status(Response.Status.OK)
+                    .entity(getAllPlaylists(token))
                     .build();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new BadRequestException();
         }
         connectionService.closeConnection();
         return response;
@@ -55,12 +52,9 @@ public class PlaylistDAO {
                     .status(Response.Status.CREATED)
                     .entity(getAllPlaylists(token))
                     .build();
-            return response;
         } catch (SQLException e) {
             e.printStackTrace();
-            response = Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .build();
+            throw new BadRequestException();
         }
         connectionService.closeConnection();
         return response;
@@ -70,19 +64,14 @@ public class PlaylistDAO {
         Response response = null;
         connectionService.initConnection();
         try {
-            if (isOwner(token, playlist.getId())) {
-                queryEditPlaylistName(playlist);
-                response = Response
-                        .status(Response.Status.OK)
-                        .entity(getAllPlaylists(token))
-                        .build();
-            } else {
-                response = Response
-                        .status(Response.Status.UNAUTHORIZED)
-                        .build();
-            }
+            queryEditPlaylistName(playlist);
+            response = Response
+                    .status(Response.Status.OK)
+                    .entity(getAllPlaylists(token))
+                    .build();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new BadRequestException();
         }
         connectionService.closeConnection();
         return response;
@@ -153,10 +142,12 @@ public class PlaylistDAO {
     }
 
     @Inject
-    private void setPlaylistsDataMapper(PlaylistsDataMapper playlistsDataMapper)
-    { this.playlistsDataMapper = playlistsDataMapper; }
+    private void setPlaylistsDataMapper(PlaylistsDataMapper playlistsDataMapper) {
+        this.playlistsDataMapper = playlistsDataMapper;
+    }
 
     @Inject
-    private void setConnectionService(ConnectionService connectionService)
-    { this.connectionService = connectionService; }
+    private void setConnectionService(ConnectionService connectionService) {
+        this.connectionService = connectionService;
+    }
 }

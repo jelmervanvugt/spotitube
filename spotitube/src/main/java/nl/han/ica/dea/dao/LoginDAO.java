@@ -2,10 +2,12 @@ package nl.han.ica.dea.dao;
 
 import nl.han.ica.dea.datamappers.LoginResponseDataMapper;
 import nl.han.ica.dea.dto.LoginDTO;
+import nl.han.ica.dea.exceptions.InvalidCredentialsException;
 import nl.han.ica.dea.services.ConnectionService;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.inject.Inject;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
@@ -21,17 +23,16 @@ public class LoginDAO {
         try {
             if (doesUserExist(loginDTO)) {
                 generateToken(loginDTO);
-                return response = Response
+                 response = Response
                         .status(Response.Status.OK)
                         .entity(loginResponseDataMapper.mapToDTO(getUser(loginDTO)))
                         .build();
             } else {
-                response = Response
-                        .status(Response.Status.UNAUTHORIZED)
-                        .build();
+                throw new InvalidCredentialsException();
             }
         } catch (SQLException | NoSuchAlgorithmException e) {
             e.printStackTrace();
+            throw new BadRequestException();
         }
         connectionService.closeConnection();
         return response;
@@ -80,5 +81,4 @@ public class LoginDAO {
     private void setConnectionService(ConnectionService connectionService) {
         this.connectionService = connectionService;
     }
-
 }

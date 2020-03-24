@@ -6,6 +6,7 @@ import nl.han.ica.dea.dto.TracksDTO;
 import nl.han.ica.dea.services.ConnectionService;
 
 import javax.inject.Inject;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import java.sql.*;
 
@@ -24,9 +25,7 @@ public class TrackDAO {
                     .build();
         } catch (SQLException e) {
             e.printStackTrace();
-            response = Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .build();
+            throw new BadRequestException();
         }
         connectionService.closeConnection();
         return response;
@@ -41,10 +40,8 @@ public class TrackDAO {
                     .entity(getAllTracksNotInPlaylist(playlistId))
                     .build();
         } catch (SQLException e) {
-            response = Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .build();
             e.printStackTrace();
+            throw new BadRequestException();
         }
         connectionService.closeConnection();
         return response;
@@ -60,10 +57,8 @@ public class TrackDAO {
                     .entity(getAllTracksFromPlaylist(playlistId))
                     .build();
         } catch (SQLException e) {
-            response = Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .build();
             e.printStackTrace();
+            throw new BadRequestException();
         }
         connectionService.closeConnection();
         return response;
@@ -79,10 +74,8 @@ public class TrackDAO {
                     .entity(getAllTracksFromPlaylist(playlistId))
                     .build();
         } catch (SQLException e) {
-            response = Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .build();
             e.printStackTrace();
+            throw new BadRequestException();
         }
         connectionService.closeConnection();
         return response;
