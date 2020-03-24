@@ -1,9 +1,9 @@
 package nl.han.ica.dea.dao;
 
-import nl.han.ica.dea.database.util.DatabaseProperties;
 import nl.han.ica.dea.datamappers.PlaylistsDataMapper;
 import nl.han.ica.dea.dto.PlaylistDTO;
 import nl.han.ica.dea.dto.PlaylistsDTO;
+import nl.han.ica.dea.services.ConnectionService;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
@@ -12,22 +12,21 @@ import java.util.ArrayList;
 
 public class PlaylistDAO {
 
-    private Connection connection = null;
-    private DatabaseProperties dbp = new DatabaseProperties();
+    private ConnectionService connectionService;
     private PlaylistsDataMapper playlistsDataMapper;
 
     public PlaylistsDTO getAllPlaylists(String token) throws SQLException {
-        initConnection();
+        connectionService.initConnection();
         PlaylistsDTO playlistsDTO;
         ArrayList<PlaylistDTO> playlists = playlistsDataMapper.mapToDTO(queryPlaylistInfo(token));
         int playlistLength = getPlaylistsLength(playlists);
         playlistsDTO = new PlaylistsDTO(playlists, playlistLength);
-        closeConnection();
+        connectionService.closeConnection();
         return playlistsDTO;
     }
 
     public Response deletePlaylist(String token, int id) {
-        initConnection();
+        connectionService.initConnection();
         Response response = null;
         try {
             if (isOwner(token, id)) {
@@ -43,12 +42,12 @@ public class PlaylistDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        closeConnection();
+        connectionService.closeConnection();
         return response;
     }
 
     public Response addPlaylist(String token, PlaylistDTO playlistDTO) {
-        initConnection();
+        connectionService.initConnection();
         Response response = null;
         try {
             queryAddPlaylist(token, playlistDTO);
@@ -63,13 +62,13 @@ public class PlaylistDAO {
                     .status(Response.Status.BAD_REQUEST)
                     .build();
         }
-        closeConnection();
+        connectionService.closeConnection();
         return response;
     }
 
     public Response editPlaylistName(String token, PlaylistDTO playlist) {
         Response response = null;
-        initConnection();
+        connectionService.initConnection();
         try {
             if (isOwner(token, playlist.getId())) {
                 queryEditPlaylistName(playlist);
@@ -85,30 +84,13 @@ public class PlaylistDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        closeConnection();
+        connectionService.closeConnection();
         return response;
-    }
-
-    private void closeConnection() {
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void initConnection() {
-        try {
-            Class.forName(dbp.driverString());
-            connection = DriverManager.getConnection(dbp.connectionString());
-        } catch (SQLException | ClassNotFoundException e) {
-            System.out.println("Error connecting to a database: " + e);
-        }
     }
 
     private void queryEditPlaylistName(PlaylistDTO playlist) throws SQLException {
         var sql = "call editPlaylistName(?, ?);";
-        var stmt = connection.prepareStatement(sql);
+        var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setInt(1, playlist.getId());
         stmt.setString(2, playlist.getName());
         stmt.executeUpdate();
@@ -116,7 +98,7 @@ public class PlaylistDAO {
 
     private void queryAddPlaylist(String token, PlaylistDTO playlistDTO) throws SQLException {
         var sql = "call addPlaylist(?, ?);";
-        var stmt = connection.prepareStatement(sql);
+        var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setString(1, token);
         stmt.setString(2, playlistDTO.getName());
         stmt.executeUpdate();
@@ -124,7 +106,7 @@ public class PlaylistDAO {
 
     private void queryDeletePlaylist(int id) throws SQLException {
         var sql = "call deletePlaylist(?);";
-        var stmt = connection.prepareStatement(sql);
+        var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setInt(1, id);
         stmt.executeUpdate();
     }
@@ -132,7 +114,7 @@ public class PlaylistDAO {
     private boolean isOwner(String token, int id) throws SQLException {
         boolean isOwner = false;
         var sql = "call doesUserOwnPlaylist(?, ?);";
-        var stmt = connection.prepareStatement(sql);
+        var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setString(1, token);
         stmt.setInt(2, id);
         ResultSet rs = stmt.executeQuery();
@@ -144,7 +126,7 @@ public class PlaylistDAO {
 
     private ResultSet queryPlaylistInfo(String token) throws SQLException {
         var sql = "call getAllPlaylists(?);";
-        var stmt = connection.prepareStatement(sql);
+        var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setString(1, token);
         ResultSet rs = stmt.executeQuery();
         return rs;
@@ -161,7 +143,7 @@ public class PlaylistDAO {
     private int getPlaylistLength(PlaylistDTO playlistDTO) throws SQLException {
         int length = 0;
         var sql = "call getPlaylistLength(?);";
-        var stmt = connection.prepareStatement(sql);
+        var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setInt(1, playlistDTO.getId());
         ResultSet rs = stmt.executeQuery();
         while (rs.next()) {
@@ -171,7 +153,10 @@ public class PlaylistDAO {
     }
 
     @Inject
-    private void setPlaylistsDataMapper(PlaylistsDataMapper playlistsDataMapper) {
-        this.playlistsDataMapper = playlistsDataMapper;
-    }
+    private void setPlaylistsDataMapper(PlaylistsDataMapper playlistsDataMapper)
+    { this.playlistsDataMapper = playlistsDataMapper; }
+
+    @Inject
+    private void setConnectionService(ConnectionService connectionService)
+    { this.connectionService = connectionService; }
 }

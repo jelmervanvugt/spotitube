@@ -1,8 +1,8 @@
 package nl.han.ica.dea.dao;
 
-import nl.han.ica.dea.database.util.DatabaseProperties;
 import nl.han.ica.dea.datamappers.LoginResponseDataMapper;
 import nl.han.ica.dea.dto.LoginDTO;
+import nl.han.ica.dea.services.ConnectionService;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.inject.Inject;
@@ -12,13 +12,12 @@ import java.sql.*;
 
 public class LoginDAO {
 
-    private Connection connection = null;
-    private DatabaseProperties dbp = new DatabaseProperties();
     private LoginResponseDataMapper loginResponseDataMapper;
+    private ConnectionService connectionService;
 
     public Response checkCredentials(LoginDTO loginDTO) {
         Response response = null;
-        initConnection();
+        connectionService.initConnection();
         try {
             if (doesUserExist(loginDTO)) {
                 generateToken(loginDTO);
@@ -34,37 +33,20 @@ public class LoginDAO {
         } catch (SQLException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        closeConnection();
+        connectionService.closeConnection();
         return response;
-    }
-
-    private void closeConnection() {
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     private ResultSet getUser(LoginDTO loginDTO) throws SQLException {
         var sql = "call getUser(?);";
-        var stmt = connection.prepareStatement(sql);
+        var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setString(1, loginDTO.getUser());
         return stmt.executeQuery();
     }
 
-    private void initConnection() {
-        try {
-            Class.forName(dbp.driverString());
-            connection = DriverManager.getConnection(dbp.connectionString());
-        } catch (SQLException | ClassNotFoundException e) {
-            System.out.println("Error connecting to a database: " + e);
-        }
-    }
-
     private boolean doesUserExist(LoginDTO loginDTO) throws SQLException, NoSuchAlgorithmException {
         var sql = "call doesUserExist(?, ?);";
-        var stmt = connection.prepareStatement(sql);
+        var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setString(1, loginDTO.getUser());
         stmt.setString(2, stringToHash(loginDTO.getPassword()));
         return procesResults(stmt.executeQuery()) == 1;
@@ -80,7 +62,7 @@ public class LoginDAO {
 
     private void generateToken(LoginDTO loginDTO) throws SQLException {
         var sql = "call generateToken(?);";
-        var stmt = connection.prepareStatement(sql);
+        var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setString(1, loginDTO.getUser());
         stmt.executeUpdate();
     }
@@ -92,6 +74,11 @@ public class LoginDAO {
     @Inject
     private void setLoginResponseDataMapper(LoginResponseDataMapper loginResponseDataMapper) {
         this.loginResponseDataMapper = loginResponseDataMapper;
+    }
+
+    @Inject
+    private void setConnectionService(ConnectionService connectionService) {
+        this.connectionService = connectionService;
     }
 
 }

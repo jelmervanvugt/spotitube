@@ -1,9 +1,9 @@
 package nl.han.ica.dea.dao;
 
-import nl.han.ica.dea.database.util.DatabaseProperties;
 import nl.han.ica.dea.datamappers.TracksDataMapper;
 import nl.han.ica.dea.dto.TrackDTO;
 import nl.han.ica.dea.dto.TracksDTO;
+import nl.han.ica.dea.services.ConnectionService;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
@@ -11,12 +11,11 @@ import java.sql.*;
 
 public class TrackDAO {
 
-    private Connection connection = null;
-    private DatabaseProperties dbp = new DatabaseProperties();
     private TracksDataMapper tracksDataMapper;
+    private ConnectionService connectionService;
 
     public Response getTracksFromPlaylist(int playlistId) {
-        initConnection();
+        connectionService.initConnection();
         Response response = null;
         try {
             response = Response
@@ -29,12 +28,12 @@ public class TrackDAO {
                     .status(Response.Status.BAD_REQUEST)
                     .build();
         }
-        closeConnection();
+        connectionService.closeConnection();
         return response;
     }
 
     public Response getTracksNotInPlaylist(int playlistId) {
-        initConnection();
+        connectionService.initConnection();
         Response response = null;
         try {
             response = Response
@@ -47,12 +46,12 @@ public class TrackDAO {
                     .build();
             e.printStackTrace();
         }
-        closeConnection();
+        connectionService.closeConnection();
         return response;
     }
 
     public Response addTrackToPlaylist(String token, int playlistId, TrackDTO track) {
-        initConnection();
+        connectionService.initConnection();
         Response response = null;
         try {
             queryAddTrackToPlaylist(playlistId, track);
@@ -66,12 +65,12 @@ public class TrackDAO {
                     .build();
             e.printStackTrace();
         }
-        closeConnection();
+        connectionService.closeConnection();
         return response;
     }
 
     public Response deleteTrackFromPlaylist(String token, int playlistId, int trackId) {
-        initConnection();
+        connectionService.initConnection();
         Response response = null;
         try {
             queryDeleteTrackFromPlaylist(playlistId, trackId);
@@ -85,30 +84,13 @@ public class TrackDAO {
                     .build();
             e.printStackTrace();
         }
-        closeConnection();
+        connectionService.closeConnection();
         return response;
-    }
-
-    private void closeConnection() {
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void initConnection() {
-        try {
-            Class.forName(dbp.driverString());
-            connection = DriverManager.getConnection(dbp.connectionString());
-        } catch (SQLException | ClassNotFoundException e) {
-            System.out.println("Error connecting to a database: " + e);
-        }
     }
 
     private void queryAddTrackToPlaylist(int playlistId, TrackDTO track) throws SQLException {
         var sql = "call addTrackToPlaylist(?, ?, ?);";
-        var stmt = connection.prepareStatement(sql);
+        var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setInt(1, playlistId);
         stmt.setInt(2, track.getId());
         stmt.setBoolean(3, track.getOfflineAvailable());
@@ -117,7 +99,7 @@ public class TrackDAO {
 
     private TracksDTO getAllTracksFromPlaylist(int playlistId) throws SQLException {
         var sql = "call getTracksFromPlaylist(?);";
-        var stmt = connection.prepareStatement(sql);
+        var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setInt(1, playlistId);
         TracksDTO tracks = tracksDataMapper.mapToDTO(stmt.executeQuery());
         return tracks;
@@ -125,7 +107,7 @@ public class TrackDAO {
 
     private TracksDTO getAllTracksNotInPlaylist(int playlistId) throws SQLException {
         var sql = "call getAllTracksNotInPlaylist(?);";
-        var stmt = connection.prepareStatement(sql);
+        var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setInt(1, playlistId);
         TracksDTO tracks = tracksDataMapper.mapToDTO(stmt.executeQuery());
         return tracks;
@@ -133,15 +115,18 @@ public class TrackDAO {
 
     private void queryDeleteTrackFromPlaylist(int playlistId, int trackId) throws SQLException {
         var sql = "call deleteTrackFromPlaylist(?, ?);";
-        var stmt = connection.prepareStatement(sql);
+        var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setInt(1, playlistId);
         stmt.setInt(2, trackId);
         stmt.executeUpdate();
     }
 
     @Inject
-    private void setTracksDataMapper(TracksDataMapper tracksDataMapper) {
-        this.tracksDataMapper = tracksDataMapper;
-    }
+    private void setTracksDataMapper(TracksDataMapper tracksDataMapper)
+    { this.tracksDataMapper = tracksDataMapper; }
+
+    @Inject
+    private void setConnectionService(ConnectionService connectionService)
+    { this.connectionService = connectionService; }
 
 }
