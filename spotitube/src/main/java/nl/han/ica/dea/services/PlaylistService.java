@@ -17,44 +17,28 @@ public class PlaylistService {
     }
 
     public Response editPlaylistName(String token, PlaylistDTO playlist) {
-        Response response;
-        playlistDAO.initConnection();
-        response = playlistDAO.editPlaylistName(token, playlist);
-        playlistDAO.closeConnection();
-        return response;
+        return playlistDAO.editPlaylistName(token, playlist);
     }
 
     public Response addPlaylist(String token, PlaylistDTO playlist) {
-        Response response;
-        playlistDAO.initConnection();
-        response = playlistDAO.addPlaylist(token, playlist);
-        playlistDAO.closeConnection();
-        return response;
+        return playlistDAO.addPlaylist(token, playlist);
     }
 
     public Response deletePlaylist(String token, int id) {
-        Response response;
-        playlistDAO.initConnection();
-        response = playlistDAO.deletePlaylist(token, id);
-        playlistDAO.closeConnection();
-        return response;
+        return playlistDAO.deletePlaylist(token, id);
     }
 
     public Response getAllPlaylists(String token) {
-        Response response = null;
-        playlistDAO.initConnection();
         try {
-            response = Response
+            return Response
                     .status(Response.Status.OK)
                     .entity(playlistDAO.getAllPlaylists(token))
                     .build();
         } catch (SQLException e) {
-            response = Response
+            e.printStackTrace();
+            return Response
                     .status(Response.Status.BAD_REQUEST)
                     .build();
-            e.printStackTrace();
         }
-        playlistDAO.closeConnection();
-        return response;
     }
 }

@@ -14,16 +14,18 @@ public class LoginDAO {
 
     private Connection connection = null;
     private DatabaseProperties dbp = new DatabaseProperties();
-    private ResultSet rs;
     private LoginResponseDataMapper loginResponseDataMapper;
 
     public Response checkCredentials(LoginDTO loginDTO) {
         Response response = null;
+        initConnection();
         try {
             if (doesUserExist(loginDTO)) {
                 generateToken(loginDTO);
-                getUser(loginDTO);
-                return response = Response.status(Response.Status.OK).entity(loginResponseDataMapper.mapToDTO(rs)).build();
+                return response = Response
+                        .status(Response.Status.OK)
+                        .entity(loginResponseDataMapper.mapToDTO(getUser(loginDTO)))
+                        .build();
             } else {
                 response = Response
                         .status(Response.Status.UNAUTHORIZED)
@@ -32,10 +34,11 @@ public class LoginDAO {
         } catch (SQLException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+        closeConnection();
         return response;
     }
 
-    public void closeConnection() {
+    private void closeConnection() {
         try {
             connection.close();
         } catch (SQLException e) {
@@ -43,14 +46,14 @@ public class LoginDAO {
         }
     }
 
-    private void getUser(LoginDTO loginDTO) throws SQLException {
+    private ResultSet getUser(LoginDTO loginDTO) throws SQLException {
         var sql = "call getUser(?);";
         var stmt = connection.prepareStatement(sql);
         stmt.setString(1, loginDTO.getUser());
-        rs = stmt.executeQuery();
+        return stmt.executeQuery();
     }
 
-    public void initConnection() {
+    private void initConnection() {
         try {
             Class.forName(dbp.driverString());
             connection = DriverManager.getConnection(dbp.connectionString());
@@ -64,11 +67,10 @@ public class LoginDAO {
         var stmt = connection.prepareStatement(sql);
         stmt.setString(1, loginDTO.getUser());
         stmt.setString(2, stringToHash(loginDTO.getPassword()));
-        rs = stmt.executeQuery();
-        return procesResults() == 1;
+        return procesResults(stmt.executeQuery()) == 1;
     }
 
-    private int procesResults() throws SQLException {
+    private int procesResults(ResultSet rs) throws SQLException {
         int nResults = 0;
         while (rs.next()) {
             nResults = rs.getInt("nUsers");

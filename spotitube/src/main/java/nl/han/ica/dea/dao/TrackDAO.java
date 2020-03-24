@@ -11,28 +11,30 @@ import java.sql.*;
 
 public class TrackDAO {
 
-    private PlaylistDAO playlistDAO;
     private Connection connection = null;
     private DatabaseProperties dbp = new DatabaseProperties();
-    private ResultSet rs;
     private TracksDataMapper tracksDataMapper;
 
     public Response getTracksFromPlaylist(int playlistId) {
+        initConnection();
         Response response = null;
         try {
-            return response = Response
+            response = Response
                     .status(Response.Status.OK)
                     .entity(getAllTracksFromPlaylist(playlistId))
                     .build();
         } catch (SQLException e) {
             e.printStackTrace();
-            return response = Response
+            response = Response
                     .status(Response.Status.BAD_REQUEST)
                     .build();
         }
+        closeConnection();
+        return response;
     }
 
     public Response getTracksNotInPlaylist(int playlistId) {
+        initConnection();
         Response response = null;
         try {
             response = Response
@@ -45,54 +47,49 @@ public class TrackDAO {
                     .build();
             e.printStackTrace();
         }
+        closeConnection();
         return response;
     }
 
     public Response addTrackToPlaylist(String token, int playlistId, TrackDTO track) {
+        initConnection();
         Response response = null;
-        playlistDAO.initConnection();
         try {
-            if (playlistDAO.isOwner(token, playlistId) && queryDoesPlaylistContainTrack(playlistId, track.getId())) {
-                queryAddTrackToPlaylist(playlistId, track);
-                response = Response
-                        .status(Response.Status.OK)
-                        .entity(getAllTracksFromPlaylist(playlistId))
-                        .build();
-            } else {
-                response = Response
-                        .status(Response.Status.BAD_REQUEST)
-                        .build();
-            }
+            queryAddTrackToPlaylist(playlistId, track);
+            response = Response
+                    .status(Response.Status.OK)
+                    .entity(getAllTracksFromPlaylist(playlistId))
+                    .build();
         } catch (SQLException e) {
+            response = Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .build();
             e.printStackTrace();
         }
-        playlistDAO.closeConnection();
+        closeConnection();
         return response;
     }
 
     public Response deleteTrackFromPlaylist(String token, int playlistId, int trackId) {
+        initConnection();
         Response response = null;
-        playlistDAO.initConnection();
         try {
-            if (playlistDAO.isOwner(token, playlistId)) {
-                queryDeleteTrackFromPlaylist(playlistId, trackId);
-                response = Response
-                        .status(Response.Status.OK)
-                        .entity(getAllTracksFromPlaylist(playlistId))
-                        .build();
-            } else {
-                response = Response
-                        .status(Response.Status.UNAUTHORIZED)
-                        .build();
-            }
+            queryDeleteTrackFromPlaylist(playlistId, trackId);
+            response = Response
+                    .status(Response.Status.OK)
+                    .entity(getAllTracksFromPlaylist(playlistId))
+                    .build();
         } catch (SQLException e) {
+            response = Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .build();
             e.printStackTrace();
         }
-        playlistDAO.closeConnection();
+        closeConnection();
         return response;
     }
 
-    public void closeConnection() {
+    private void closeConnection() {
         try {
             connection.close();
         } catch (SQLException e) {
@@ -100,7 +97,7 @@ public class TrackDAO {
         }
     }
 
-    public void initConnection() {
+    private void initConnection() {
         try {
             Class.forName(dbp.driverString());
             connection = DriverManager.getConnection(dbp.connectionString());
@@ -116,21 +113,6 @@ public class TrackDAO {
         stmt.setInt(2, track.getId());
         stmt.setBoolean(3, track.getOfflineAvailable());
         stmt.executeUpdate();
-    }
-
-    private boolean queryDoesPlaylistContainTrack(int playlistId, int trackId) throws SQLException {
-        var sql = "call doesPlaylistContainTrack(?, ?);";
-        var stmt = connection.prepareStatement(sql);
-        stmt.setInt(1, playlistId);
-        stmt.setInt(2, trackId);
-        rs = stmt.executeQuery();
-
-        while (rs.next()) {
-            if (rs.getInt("nResults") == 0) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private TracksDTO getAllTracksFromPlaylist(int playlistId) throws SQLException {
@@ -155,11 +137,6 @@ public class TrackDAO {
         stmt.setInt(1, playlistId);
         stmt.setInt(2, trackId);
         stmt.executeUpdate();
-    }
-
-    @Inject
-    private void setPlaylistDAO(PlaylistDAO playlistDAO) {
-        this.playlistDAO = playlistDAO;
     }
 
     @Inject

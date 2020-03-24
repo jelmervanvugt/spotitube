@@ -15,18 +15,19 @@ public class PlaylistDAO {
     private Connection connection = null;
     private DatabaseProperties dbp = new DatabaseProperties();
     private PlaylistsDataMapper playlistsDataMapper;
-    private ResultSet rs;
 
     public PlaylistsDTO getAllPlaylists(String token) throws SQLException {
+        initConnection();
         PlaylistsDTO playlistsDTO;
-        rs = queryPlaylistInfo(token);
-        ArrayList<PlaylistDTO> playlists = playlistsDataMapper.mapToDTO(rs);
+        ArrayList<PlaylistDTO> playlists = playlistsDataMapper.mapToDTO(queryPlaylistInfo(token));
         int playlistLength = getPlaylistsLength(playlists);
         playlistsDTO = new PlaylistsDTO(playlists, playlistLength);
+        closeConnection();
         return playlistsDTO;
     }
 
     public Response deletePlaylist(String token, int id) {
+        initConnection();
         Response response = null;
         try {
             if (isOwner(token, id)) {
@@ -42,10 +43,12 @@ public class PlaylistDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        closeConnection();
         return response;
     }
 
     public Response addPlaylist(String token, PlaylistDTO playlistDTO) {
+        initConnection();
         Response response = null;
         try {
             queryAddPlaylist(token, playlistDTO);
@@ -60,11 +63,13 @@ public class PlaylistDAO {
                     .status(Response.Status.BAD_REQUEST)
                     .build();
         }
+        closeConnection();
         return response;
     }
 
     public Response editPlaylistName(String token, PlaylistDTO playlist) {
         Response response = null;
+        initConnection();
         try {
             if (isOwner(token, playlist.getId())) {
                 queryEditPlaylistName(playlist);
@@ -80,10 +85,11 @@ public class PlaylistDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        closeConnection();
         return response;
     }
 
-    public void closeConnection() {
+    private void closeConnection() {
         try {
             connection.close();
         } catch (SQLException e) {
@@ -91,7 +97,7 @@ public class PlaylistDAO {
         }
     }
 
-    public void initConnection() {
+    private void initConnection() {
         try {
             Class.forName(dbp.driverString());
             connection = DriverManager.getConnection(dbp.connectionString());
@@ -123,13 +129,13 @@ public class PlaylistDAO {
         stmt.executeUpdate();
     }
 
-    public boolean isOwner(String token, int id) throws SQLException {
+    private boolean isOwner(String token, int id) throws SQLException {
         boolean isOwner = false;
         var sql = "call doesUserOwnPlaylist(?, ?);";
         var stmt = connection.prepareStatement(sql);
         stmt.setString(1, token);
         stmt.setInt(2, id);
-        rs = stmt.executeQuery();
+        ResultSet rs = stmt.executeQuery();
         while (rs.next()) {
             isOwner = rs.getBoolean("isOwner");
         }
@@ -157,7 +163,7 @@ public class PlaylistDAO {
         var sql = "call getPlaylistLength(?);";
         var stmt = connection.prepareStatement(sql);
         stmt.setInt(1, playlistDTO.getId());
-        rs = stmt.executeQuery();
+        ResultSet rs = stmt.executeQuery();
         while (rs.next()) {
             length = rs.getInt("playlistlength");
         }

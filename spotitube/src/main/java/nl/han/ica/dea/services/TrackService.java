@@ -10,37 +10,17 @@ public class TrackService {
 
     private TrackDAO trackDAO;
 
-    public Response getTracksNotInPlaylist(int playlistId) {
-        Response response;
-        trackDAO.initConnection();
-        response = trackDAO.getTracksNotInPlaylist(playlistId);
-        trackDAO.closeConnection();
-        return response;
-    }
+    public Response getTracksNotInPlaylist(int playlistId)
+    { return trackDAO.getTracksNotInPlaylist(playlistId); }
 
-    public Response addTrackToPlaylist(String token, int playlistId, TrackDTO track) {
-        Response response;
-        trackDAO.initConnection();
-        response = trackDAO.addTrackToPlaylist(token, playlistId, track);
-        trackDAO.closeConnection();
-        return response;
-    }
+    public Response addTrackToPlaylist(String token, int playlistId, TrackDTO track)
+    { return trackDAO.addTrackToPlaylist(token, playlistId, track); }
 
-    public Response deleteTrackFromPlaylist(String token, int playlistId, int trackId) {
-        Response response;
-        trackDAO.initConnection();
-        response = trackDAO.deleteTrackFromPlaylist(token, playlistId, trackId);
-        trackDAO.closeConnection();
-        return response;
-    }
+    public Response deleteTrackFromPlaylist(String token, int playlistId, int trackId)
+    { return trackDAO.deleteTrackFromPlaylist(token, playlistId, trackId); }
 
-    public Response getTracksFromPlaylist(int playlistId) {
-        Response response;
-        trackDAO.initConnection();
-        response = trackDAO.getTracksFromPlaylist(playlistId);
-        trackDAO.closeConnection();
-        return response;
-    }
+    public Response getTracksFromPlaylist(int playlistId)
+    { return trackDAO.getTracksFromPlaylist(playlistId); }
 
     @Inject
     private void setTrackDAO(TrackDAO trackDAO) {

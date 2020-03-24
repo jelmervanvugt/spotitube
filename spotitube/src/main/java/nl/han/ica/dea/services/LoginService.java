@@ -10,13 +10,8 @@ public class LoginService {
 
     private LoginDAO loginDAO;
 
-    public Response checkCredentials(LoginDTO loginDTO) {
-       Response response;
-       loginDAO.initConnection();
-       response = loginDAO.checkCredentials(loginDTO);
-       loginDAO.closeConnection();
-       return response;
-    }
+    public Response checkCredentials(LoginDTO loginDTO)
+    { return loginDAO.checkCredentials(loginDTO); }
 
     @Inject
     public void setLoginDAO(LoginDAO loginDAO) {
