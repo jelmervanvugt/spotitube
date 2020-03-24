@@ -34,8 +34,7 @@ public class ConnectionService {
     }
 
     @Inject
-    private void setDbp(DatabaseProperties databaseProperties) {
-        this.databaseProperties = databaseProperties;
-    }
+    public void setDatabaseProperties(DatabaseProperties databaseProperties)
+    { this.databaseProperties = databaseProperties; }
 
 }

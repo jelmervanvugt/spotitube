@@ -60,12 +60,12 @@ public class PlaylistController {
     { return playlistService.getAllPlaylists(token); }
 
     @Inject
-    private void setPlaylistService(PlaylistService playlistService) {
+    public void setPlaylistService(PlaylistService playlistService) {
         this.playlistService = playlistService;
     }
 
     @Inject
-    private void setTrackService(TrackService trackService) {
+    public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
     }
 

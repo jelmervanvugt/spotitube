@@ -21,7 +21,7 @@ public class LoginController {
     }
 
     @Inject
-    private void setLoginService(LoginService loginService) {
+    public void setLoginService(LoginService loginService) {
         this.loginService = loginService;
     }
 

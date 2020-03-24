@@ -18,7 +18,7 @@ public class TrackController {
     { return trackService.getTracksNotInPlaylist(playlistId); }
 
     @Inject
-    private void setTrackService(TrackService trackService) {
+    public void setTrackService(TrackService trackService) {
         this.trackService = trackService;
     }
 

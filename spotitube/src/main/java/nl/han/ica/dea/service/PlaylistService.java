@@ -11,22 +11,14 @@ public class PlaylistService {
 
     private PlaylistDAO playlistDAO;
 
-    @Inject
-    private void setPlaylistDAO(PlaylistDAO playlistDAO) {
-        this.playlistDAO = playlistDAO;
-    }
+    public Response editPlaylistName(String token, PlaylistDTO playlist)
+    { return playlistDAO.editPlaylistName(token, playlist); }
 
-    public Response editPlaylistName(String token, PlaylistDTO playlist) {
-        return playlistDAO.editPlaylistName(token, playlist);
-    }
+    public Response addPlaylist(String token, PlaylistDTO playlist)
+    { return playlistDAO.addPlaylist(token, playlist); }
 
-    public Response addPlaylist(String token, PlaylistDTO playlist) {
-        return playlistDAO.addPlaylist(token, playlist);
-    }
-
-    public Response deletePlaylist(String token, int id) {
-        return playlistDAO.deletePlaylist(token, id);
-    }
+    public Response deletePlaylist(String token, int id)
+    { return playlistDAO.deletePlaylist(token, id); }
 
     public Response getAllPlaylists(String token) {
         try {
@@ -41,4 +33,9 @@ public class PlaylistService {
                     .build();
         }
     }
+
+    @Inject
+    private void setPlaylistDAO(PlaylistDAO playlistDAO)
+    { this.playlistDAO = playlistDAO; }
+
 }
