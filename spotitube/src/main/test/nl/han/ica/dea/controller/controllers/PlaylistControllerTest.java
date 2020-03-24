@@ -1,7 +1,7 @@
 package nl.han.ica.dea.controller.controllers;
 
 import nl.han.ica.dea.controller.dto.PlaylistDTO;
-import nl.han.ica.dea.controller.dto.PlaylistsDTO;
+import nl.han.ica.dea.controller.dto.PlaylistsDTOTest;
 import nl.han.ica.dea.controller.dto.TrackDTO;
 import nl.han.ica.dea.controller.dto.TracksDTO;
 import nl.han.ica.dea.service.PlaylistService;
@@ -24,7 +24,7 @@ public class PlaylistControllerTest {
     private static TracksDTO tracksDTO = new TracksDTO();
     private static TrackDTO trackDTO = new TrackDTO();
     private static PlaylistDTO playlistDTO = new PlaylistDTO();
-    private static PlaylistsDTO playlistsDTO = new PlaylistsDTO();
+    private static PlaylistsDTOTest playlistsDTOTest = new PlaylistsDTOTest();
 
     private static String token = "token";
     private static int playlistId = 1;
@@ -86,7 +86,7 @@ public class PlaylistControllerTest {
     class FnEditPlaylist {
         @Test
         public void testResponseVanEndpoint() {
-            var expected = Response.status(Response.Status.OK).entity(playlistsDTO).build();
+            var expected = Response.status(Response.Status.OK).entity(playlistsDTOTest).build();
 
             Mockito.when(mockedPlaylistService.editPlaylistName(token, playlistDTO)).thenReturn(expected);
             var actual = sut.editPlaylist(playlistDTO, playlistId, token);
@@ -100,7 +100,7 @@ public class PlaylistControllerTest {
     class FnAddPlaylist {
         @Test
         public void testResponseVanEndpoint() {
-            var expected = Response.status(Response.Status.OK).entity(playlistsDTO).build();
+            var expected = Response.status(Response.Status.OK).entity(playlistsDTOTest).build();
 
             Mockito.when(mockedPlaylistService.addPlaylist(token, playlistDTO)).thenReturn(expected);
             var actual = sut.addPlaylist(playlistDTO, token);
@@ -114,7 +114,7 @@ public class PlaylistControllerTest {
     class FnDeletePlaylist {
         @Test
         public void testResponseVanEndpoint() {
-            var expected = Response.status(Response.Status.OK).entity(playlistsDTO).build();
+            var expected = Response.status(Response.Status.OK).entity(playlistsDTOTest).build();
 
             Mockito.when(mockedPlaylistService.deletePlaylist(token, playlistId)).thenReturn(expected);
             var actual = sut.deletePlaylist(playlistId, token);
@@ -128,7 +128,7 @@ public class PlaylistControllerTest {
     class FnGetAllPlaylists {
         @Test
         public void testResponseVanEndpoint() {
-            var expected = Response.status(Response.Status.OK).entity(playlistsDTO).build();
+            var expected = Response.status(Response.Status.OK).entity(playlistsDTOTest).build();
 
             Mockito.when(mockedPlaylistService.getAllPlaylists(token)).thenReturn(expected);
             var actual = sut.getAllPlaylists(token);

@@ -17,6 +17,11 @@ public class LoginControllerTest {
     private LoginController sut;
     private LoginService mockedLoginService;
 
+    private String user = "user";
+    private String password = "password";
+    private String token = "token";
+    private String fullname = "fullname";
+
     @BeforeEach
     public void setup() {
         sut = new LoginController();
@@ -29,8 +34,8 @@ public class LoginControllerTest {
     class FnLoginTest {
         @Test
         public void testResponseVanEndpoint() {
-            var loginDTO = new LoginDTO("user", "password");
-            var loginResponseDTO = new LoginResponseDTO("token", "fullname");
+            var loginDTO = new LoginDTO(user, password);
+            var loginResponseDTO = new LoginResponseDTO(token, fullname);
             var expected = Response.status(Response.Status.OK).entity(loginResponseDTO).build();
 
             Mockito.when(mockedLoginService.checkCredentials(loginDTO)).thenReturn(expected);

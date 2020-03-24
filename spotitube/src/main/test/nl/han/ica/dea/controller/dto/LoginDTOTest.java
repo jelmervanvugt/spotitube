@@ -8,13 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LoginDTOTest {
 
-    private LoginDTO loginDTO;
+    private LoginDTO sut;
     private String user = "user";
     private String password = "password";
 
     @BeforeEach
     public void setup() {
-        loginDTO = new LoginDTO(user, password);
+        sut = new LoginDTO(user, password);
     }
 
     @Nested
@@ -23,7 +23,7 @@ public class LoginDTOTest {
        public void testReturnWaarde() {
            var expected = user;
 
-           var actual = loginDTO.getUser();
+           var actual = sut.getUser();
 
            assertEquals(expected, actual);
        }
@@ -35,7 +35,7 @@ public class LoginDTOTest {
         public void testReturnWaarde() {
             var expected = password;
 
-            var actual = loginDTO.getPassword();
+            var actual = sut.getPassword();
 
             assertEquals(expected, actual);
         }
@@ -46,9 +46,9 @@ public class LoginDTOTest {
         @Test
         public void testSetFn() {
             var expected = "newuser";
-            loginDTO.setUser(expected);
+            sut.setUser(expected);
 
-            var actual = loginDTO.getUser();
+            var actual = sut.getUser();
 
             assertEquals(expected, actual);
         }
@@ -59,9 +59,9 @@ public class LoginDTOTest {
         @Test
         public void testSetFn() {
             var expected = "newpassword";
-            loginDTO.setPassword(expected);
+            sut.setPassword(expected);
 
-            var actual = loginDTO.getPassword();
+            var actual = sut.getPassword();
 
             assertEquals(expected, actual);
         }

@@ -7,7 +7,6 @@ public class LoginResponseDTO {
     public LoginResponseDTO() {}
 
     public LoginResponseDTO(String user, String token) {
-
         this.token = token;
         this.user = user;
     }
