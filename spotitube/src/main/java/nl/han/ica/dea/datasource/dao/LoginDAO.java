@@ -1,14 +1,12 @@
 package nl.han.ica.dea.datasource.dao;
 
+import nl.han.ica.dea.controller.dto.LoginResponseDTO;
 import nl.han.ica.dea.datasource.datamappers.LoginResponseDataMapper;
 import nl.han.ica.dea.controller.dto.LoginDTO;
-import nl.han.ica.dea.datasource.exceptions.InvalidCredentialsException;
 import nl.han.ica.dea.service.ConnectionService;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.inject.Inject;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.core.Response;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 
@@ -17,25 +15,12 @@ public class LoginDAO {
     private LoginResponseDataMapper loginResponseDataMapper;
     private ConnectionService connectionService;
 
-    public Response checkCredentials(LoginDTO loginDTO) {
-        Response response = null;
+    public LoginResponseDTO checkCredentials(LoginDTO loginDTO) throws SQLException {
+        LoginResponseDTO loginResponseDTO;
         connectionService.initConnection();
-        try {
-            if (doesUserExist(loginDTO)) {
-                generateToken(loginDTO);
-                 response = Response
-                        .status(Response.Status.OK)
-                        .entity(loginResponseDataMapper.mapToDTO(getUser(loginDTO)))
-                        .build();
-            } else {
-                throw new InvalidCredentialsException();
-            }
-        } catch (SQLException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            throw new BadRequestException();
-        }
+        loginResponseDTO = loginResponseDataMapper.mapToDTO(getUser(loginDTO));
         connectionService.closeConnection();
-        return response;
+        return loginResponseDTO;
     }
 
     private ResultSet getUser(LoginDTO loginDTO) throws SQLException {
@@ -45,27 +30,32 @@ public class LoginDAO {
         return stmt.executeQuery();
     }
 
-    private boolean doesUserExist(LoginDTO loginDTO) throws SQLException, NoSuchAlgorithmException {
+    public boolean doesUserExist(LoginDTO loginDTO) throws SQLException, NoSuchAlgorithmException {
+        connectionService.initConnection();
         var sql = "call doesUserExist(?, ?);";
         var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setString(1, loginDTO.getUser());
         stmt.setString(2, stringToHash(loginDTO.getPassword()));
-        return procesResults(stmt.executeQuery()) == 1;
+        boolean doesExist = procesResults(stmt.executeQuery());
+        connectionService.closeConnection();
+        return doesExist;
     }
 
-    private int procesResults(ResultSet rs) throws SQLException {
+    private boolean procesResults(ResultSet rs) throws SQLException {
         int nResults = 0;
         while (rs.next()) {
             nResults = rs.getInt("nUsers");
         }
-        return nResults;
+        return nResults == 1;
     }
 
-    private void generateToken(LoginDTO loginDTO) throws SQLException {
+    public void generateToken(LoginDTO loginDTO) throws SQLException {
+        connectionService.initConnection();
         var sql = "call generateToken(?);";
         var stmt = connectionService.getConnection().prepareStatement(sql);
         stmt.setString(1, loginDTO.getUser());
         stmt.executeUpdate();
+        connectionService.closeConnection();
     }
 
     private String stringToHash(String string) throws NoSuchAlgorithmException {
@@ -73,12 +63,12 @@ public class LoginDAO {
     }
 
     @Inject
-    private void setLoginResponseDataMapper(LoginResponseDataMapper loginResponseDataMapper) {
+    public void setLoginResponseDataMapper(LoginResponseDataMapper loginResponseDataMapper) {
         this.loginResponseDataMapper = loginResponseDataMapper;
     }
 
     @Inject
-    private void setConnectionService(ConnectionService connectionService) {
+    public void setConnectionService(ConnectionService connectionService) {
         this.connectionService = connectionService;
     }
 }
