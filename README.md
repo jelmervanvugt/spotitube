@@ -1,6 +1,6 @@
 # spotitube
 
-<h1>aim han nijmegen: oose dea<h1>
-<h3>door: jelmer van vugt<h3>
+<p>aim han nijmegen: oose dea<p>
+<p>door: jelmer van vugt<p>
 
  
