@@ -16,14 +16,23 @@ public class PlaylistDAO {
     private ConnectionService connectionService;
     private PlaylistsDataMapper playlistsDataMapper;
 
-    public PlaylistsDTO getAllPlaylists(String token) throws SQLException {
+    public Response getAllPlaylists(String token) {
+        Response response = null;
         connectionService.initConnection();
-        PlaylistsDTO playlistsDTO;
-        ArrayList<PlaylistDTO> playlists = playlistsDataMapper.mapToDTO(queryPlaylistInfo(token));
-        int playlistLength = getPlaylistsLength(playlists);
-        playlistsDTO = new PlaylistsDTO(playlists, playlistLength);
+       try {
+           ArrayList<PlaylistDTO> playlists = playlistsDataMapper.mapToDTO(queryPlaylistInfo(token));
+           int playlistLength = getPlaylistsLength(playlists);
+           PlaylistsDTO playlistsDTO = new PlaylistsDTO(playlists, playlistLength);
+           response = Response
+                   .status(Response.Status.OK)
+                   .entity(playlistsDTO)
+                   .build();
+       } catch(SQLException e) {
+           e.printStackTrace();
+           throw new BadRequestException();
+       }
         connectionService.closeConnection();
-        return playlistsDTO;
+       return response;
     }
 
     public Response deletePlaylist(String token, int id) {
@@ -31,10 +40,7 @@ public class PlaylistDAO {
         connectionService.initConnection();
         try {
             queryDeletePlaylist(id);
-            response = Response
-                    .status(Response.Status.OK)
-                    .entity(getAllPlaylists(token))
-                    .build();
+            response = getAllPlaylists(token);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new BadRequestException();
@@ -48,10 +54,7 @@ public class PlaylistDAO {
         Response response = null;
         try {
             queryAddPlaylist(token, playlistDTO);
-            response = Response
-                    .status(Response.Status.CREATED)
-                    .entity(getAllPlaylists(token))
-                    .build();
+            response = getAllPlaylists(token);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new BadRequestException();
@@ -65,10 +68,7 @@ public class PlaylistDAO {
         connectionService.initConnection();
         try {
             queryEditPlaylistName(playlist);
-            response = Response
-                    .status(Response.Status.OK)
-                    .entity(getAllPlaylists(token))
-                    .build();
+            response = getAllPlaylists(token);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new BadRequestException();

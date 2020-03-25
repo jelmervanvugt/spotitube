@@ -23,7 +23,7 @@ public class TrackService {
     { return trackDAO.getTracksFromPlaylist(playlistId); }
 
     @Inject
-    private void setTrackDAO(TrackDAO trackDAO) {
+    public void setTrackDAO(TrackDAO trackDAO) {
         this.trackDAO = trackDAO;
     }
 

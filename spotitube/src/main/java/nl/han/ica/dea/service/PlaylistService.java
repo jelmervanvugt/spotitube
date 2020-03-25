@@ -5,7 +5,6 @@ import nl.han.ica.dea.controller.dto.PlaylistDTO;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
-import java.sql.SQLException;
 
 public class PlaylistService {
 
@@ -20,22 +19,13 @@ public class PlaylistService {
     public Response deletePlaylist(String token, int id)
     { return playlistDAO.deletePlaylist(token, id); }
 
-    public Response getAllPlaylists(String token) {
-        try {
-            return Response
-                    .status(Response.Status.OK)
-                    .entity(playlistDAO.getAllPlaylists(token))
-                    .build();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .build();
-        }
-    }
+    public Response getAllPlaylists(String token)
+    { return playlistDAO.getAllPlaylists(token); }
 
     @Inject
-    private void setPlaylistDAO(PlaylistDAO playlistDAO)
+    public void setPlaylistDAO(PlaylistDAO playlistDAO)
     { this.playlistDAO = playlistDAO; }
-
 }
+
+
+
