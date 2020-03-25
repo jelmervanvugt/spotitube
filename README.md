@@ -1,7 +1,6 @@
 # spotitube
 
-<span style="color: pink;">
-if u read this ur gay lol
- </span>
+<p>aim han nijmegen: oose dea<p>
+<p>door: jelmer van vugt<p>
 
  
