@@ -55,11 +55,11 @@ public class TrackDAO {
     }
 
     @Inject
-    private void setTracksDataMapper(TracksDataMapper tracksDataMapper)
+    public void setTracksDataMapper(TracksDataMapper tracksDataMapper)
     { this.tracksDataMapper = tracksDataMapper; }
 
     @Inject
-    private void setConnectionService(ConnectionService connectionService)
+    public void setConnectionService(ConnectionService connectionService)
     { this.connectionService = connectionService; }
 
 }

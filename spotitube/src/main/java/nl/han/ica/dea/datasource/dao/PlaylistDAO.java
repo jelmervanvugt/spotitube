@@ -79,12 +79,12 @@ public class PlaylistDAO {
     }
 
     @Inject
-    private void setPlaylistsDataMapper(PlaylistsDataMapper playlistsDataMapper) {
+    public void setPlaylistsDataMapper(PlaylistsDataMapper playlistsDataMapper) {
         this.playlistsDataMapper = playlistsDataMapper;
     }
 
     @Inject
-    private void setConnectionService(ConnectionService connectionService) {
+    public void setConnectionService(ConnectionService connectionService) {
         this.connectionService = connectionService;
     }
 }
