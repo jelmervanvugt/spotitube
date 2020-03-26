@@ -16,7 +16,7 @@ public class LoginService {
 
     public Response checkCredentials(LoginDTO loginDTO) {
         try {
-            if(loginDAO.doesUserExist(loginDTO)) {
+            if (loginDAO.doesUserExist(loginDTO)) {
                 loginDAO.generateToken(loginDTO);
                 return Response
                         .status(Response.Status.OK)
@@ -25,7 +25,7 @@ public class LoginService {
             } else {
                 throw new InvalidCredentialsException();
             }
-        } catch(SQLException | NoSuchAlgorithmException e) {
+        } catch (SQLException | NoSuchAlgorithmException e) {
             e.printStackTrace();
             throw new BadRequestException();
         }

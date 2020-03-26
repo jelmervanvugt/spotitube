@@ -23,13 +23,6 @@ public class LoginDAO {
         return loginResponseDTO;
     }
 
-    private ResultSet getUser(LoginDTO loginDTO) throws SQLException {
-        var sql = "call getUser(?);";
-        var stmt = connectionService.getConnection().prepareStatement(sql);
-        stmt.setString(1, loginDTO.getUser());
-        return stmt.executeQuery();
-    }
-
     public boolean doesUserExist(LoginDTO loginDTO) throws SQLException, NoSuchAlgorithmException {
         connectionService.initConnection();
         var sql = "call doesUserExist(?, ?);";
@@ -39,14 +32,6 @@ public class LoginDAO {
         boolean doesExist = procesResults(stmt.executeQuery());
         connectionService.closeConnection();
         return doesExist;
-    }
-
-    private boolean procesResults(ResultSet rs) throws SQLException {
-        int nResults = 0;
-        while (rs.next()) {
-            nResults = rs.getInt("nUsers");
-        }
-        return nResults == 1;
     }
 
     public void generateToken(LoginDTO loginDTO) throws SQLException {
@@ -60,6 +45,21 @@ public class LoginDAO {
 
     private String stringToHash(String string) throws NoSuchAlgorithmException {
         return DigestUtils.sha256Hex(string);
+    }
+
+    private ResultSet getUser(LoginDTO loginDTO) throws SQLException {
+        var sql = "call getUser(?);";
+        var stmt = connectionService.getConnection().prepareStatement(sql);
+        stmt.setString(1, loginDTO.getUser());
+        return stmt.executeQuery();
+    }
+
+    private boolean procesResults(ResultSet rs) throws SQLException {
+        int nResults = 0;
+        while (rs.next()) {
+            nResults = rs.getInt("nUsers");
+        }
+        return nResults == 1;
     }
 
     @Inject
