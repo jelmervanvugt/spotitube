@@ -1,5 +1,19 @@
 use spotitube;
 
+/* voegt een user toe */
+delimiter //
+drop procedure if exists addUser //
+create procedure addUser (
+in		fullname			varchar(250),
+in 		user		 		varchar(50), 
+in 		password 	varchar(64)
+)
+begin
+		insert into user(fullname, user, password) values 
+        (fullname, user, password);
+end //
+delimiter ;
+
 /* bestaat de user */
 delimiter //
 drop procedure if exists doesUserExist //
@@ -231,6 +245,32 @@ begin
 										);
 end //
 delimiter ;
+
+/* returned tracks die niet in playlist zitten */
+delimiter //
+drop procedure if exists editUserFullname //
+create procedure editUserFullname (
+in 		userid		 					int,
+in 		fullname						varchar(250)
+)
+begin
+		update user u set
+        u.fullname = fullname
+        where u.id = userid;
+end //
+delimiter ;
+
+/* returned tracks die niet in playlist zitten */
+delimiter //
+drop procedure if exists deleteUser //
+create procedure deleteUser (
+in 		userid		 					int
+)
+begin
+		delete from user where id = userid;
+end //
+delimiter ;
+
 
 
 

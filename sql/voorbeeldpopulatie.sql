@@ -25,7 +25,7 @@ insert into playlist(name) values
 
 insert into userplaylist(userid, playlistid, isowner) values
 (1, 1, true),
-(1, 2, true);
+(1, 2, false);
 
 insert into playlistsong(playlistid, trackid) values
 (1, 1),
@@ -35,7 +35,7 @@ insert into playlistsong(playlistid, trackid) values
 (2, 5),
 (2, 6);
 
-
+select * from user
 
 
 
