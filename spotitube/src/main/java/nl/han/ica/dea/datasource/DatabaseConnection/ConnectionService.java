@@ -5,7 +5,6 @@ import nl.han.ica.dea.datasource.exceptions.DatabaseConnectionException;
 import javax.inject.Inject;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 public class ConnectionService {
 
@@ -29,7 +28,7 @@ public class ConnectionService {
     public void closeConnection() {
         try {
             connection.close();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new DatabaseConnectionException();
         }
@@ -38,5 +37,10 @@ public class ConnectionService {
     @Inject
     public void setDatabaseProperties(DatabaseProperties databaseProperties)
     { this.databaseProperties = databaseProperties; }
+
+    // Puur voor test doeleinden.
+    public DatabaseProperties getDatabaseProperties() {
+        return databaseProperties;
+    }
 
 }
