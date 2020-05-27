@@ -4,6 +4,7 @@ import nl.han.ica.dea.controller.dto.LoginDTO;
 import nl.han.ica.dea.controller.dto.LoginResponseDTO;
 import nl.han.ica.dea.datasource.dao.LoginDAO;
 import nl.han.ica.dea.datasource.exceptions.InvalidCredentialsException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,61 +16,96 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class LoginServiceTest {
 
     private LoginService sut;
     private LoginDAO mockedLoginDAO;
 
+    private LoginDTO loginDTO;
+
     @BeforeEach
     public void setup() {
         sut = new LoginService();
         mockedLoginDAO = Mockito.mock(LoginDAO.class);
         sut.setLoginDAO(mockedLoginDAO);
+
+        loginDTO = new LoginDTO();
     }
 
-    @Nested
-    public class FnCheckCredentials {
-        @Test
-        public void testValidCredentials() {
-            try {
-                var loginDTO = new LoginDTO();
-                var loginResponseDTO = new LoginResponseDTO();
-                var expected = Response.status(Response.Status.OK).entity(loginResponseDTO).build();
-                Mockito.when(mockedLoginDAO.doesUserExist(loginDTO)).thenReturn(true);
-                Mockito.when(mockedLoginDAO.checkCredentials(loginDTO)).thenReturn(loginResponseDTO);
+    @Test
+    public void test1_loginDAO_setterWorks() {
+        var expected = mockedLoginDAO;
+        sut.setLoginDAO(expected);
 
-                var actual = sut.checkCredentials(loginDTO);
+        var result = sut.getLoginDAO();
 
-                assertEquals(expected.getStatus(), actual.getStatus());
-                assertEquals(expected.getEntity(), actual.getEntity());
-            } catch(SQLException | NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            }
-        }
+        Assertions.assertEquals(expected, result);
+    }
 
-        @Test
-        public void testThrowsInvalidCredentialsException() throws SQLException, NoSuchAlgorithmException {
-            try {
-                var loginDTO = new LoginDTO();
-                Mockito.when(mockedLoginDAO.doesUserExist(loginDTO)).thenReturn(false);
-                sut.checkCredentials(loginDTO);
-            } catch(Exception actual) {
-                var expected = new InvalidCredentialsException();
-                assertEquals(expected.getClass(), actual.getClass());
-            }
-        }
+    @Test
+    public void test2_checkCredentials_calls_DAO() {
+        try {
+            var nTimesCalled = 1;
+            when(mockedLoginDAO.doesUserExist(loginDTO)).thenReturn(true);
 
-        @Test
-        public void testThrowsBadRequestException() throws SQLException, NoSuchAlgorithmException {
-            try {
-                var loginDTO = new LoginDTO();
-                Mockito.when(mockedLoginDAO.doesUserExist(loginDTO)).thenThrow(new SQLException());
-                sut.checkCredentials(loginDTO);
-            } catch(Exception actual) {
-                var expected = new BadRequestException();
-                assertEquals(expected.getClass(), actual.getClass());
-            }
+            sut.checkCredentials(loginDTO);
+
+            verify(mockedLoginDAO, times(nTimesCalled)).doesUserExist(loginDTO);
+            verify(mockedLoginDAO, times(nTimesCalled)).generateToken(loginDTO);
+            verify(mockedLoginDAO, times(nTimesCalled)).checkCredentials(loginDTO);
+
+        } catch(Exception e) {
+            fail();
         }
     }
+
+    @Test
+    public void test3_checkCredentials_returnsOK() {
+        try {
+            var expected = Response.Status.OK;
+            when(mockedLoginDAO.doesUserExist(loginDTO)).thenReturn(true);
+
+            var result = sut.checkCredentials(loginDTO);
+
+            Assertions.assertEquals(expected.getStatusCode(), result.getStatus());
+        } catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test4_checkCredentials_returns_InvalidCredentialsException_when_doesUserExist_isFalse() {
+        try {
+            when(mockedLoginDAO.doesUserExist(loginDTO)).thenReturn(false);
+
+            Assertions.assertThrows(InvalidCredentialsException.class, () -> sut.checkCredentials(loginDTO));
+        }  catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test5_checkCredentials_throws_InvalidCredentialsException_when_generateToken_throwsException() {
+        try {
+            doThrow(Exception.class).when(mockedLoginDAO).generateToken(loginDTO);
+
+            Assertions.assertThrows(BadRequestException.class, () -> sut.checkCredentials(loginDTO));
+        }  catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test6_checkCredentials_returns_InvalidCredentialsException_when_checkCredentials_throwsException() {
+        try {
+            doThrow(Exception.class).when(mockedLoginDAO).checkCredentials(loginDTO);
+
+            Assertions.assertThrows(BadRequestException.class, () -> sut.checkCredentials(loginDTO));
+        }  catch(Exception e) {
+            fail();
+        }
+    }
+
 }

@@ -25,7 +25,7 @@ public class LoginService {
             } else {
                 throw new InvalidCredentialsException();
             }
-        } catch (SQLException | NoSuchAlgorithmException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new BadRequestException();
         }
@@ -34,5 +34,10 @@ public class LoginService {
     @Inject
     public void setLoginDAO(LoginDAO loginDAO) {
         this.loginDAO = loginDAO;
+    }
+
+    // Puur voor test doeleinden.
+    public LoginDAO getLoginDAO() {
+        return loginDAO;
     }
 }
