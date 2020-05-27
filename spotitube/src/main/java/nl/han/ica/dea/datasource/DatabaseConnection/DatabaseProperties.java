@@ -1,4 +1,4 @@
-package nl.han.ica.dea.datasource.util;
+package nl.han.ica.dea.datasource.DatabaseConnection;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -11,7 +11,7 @@ public class DatabaseProperties {
     private Logger logger = Logger.getLogger(getClass().getName());
     private Properties properties;
 
-    public DatabaseProperties() {
+    public DatabaseProperties() throws Exception {
         properties = new Properties();
         try {
             properties.load(Objects.requireNonNull(getClass()
@@ -19,6 +19,7 @@ public class DatabaseProperties {
                     .getResourceAsStream("database.properties")));
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Can't access property file database.properties", e);
+            throw new Exception();
         }
     }
 

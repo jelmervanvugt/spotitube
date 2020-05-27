@@ -25,4 +25,9 @@ public class LoginController {
         this.loginService = loginService;
     }
 
+    // Puur voor test doeleinden.
+    public LoginService getLoginService() {
+        return loginService;
+    }
+
 }

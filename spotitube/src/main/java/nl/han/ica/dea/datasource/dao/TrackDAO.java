@@ -3,7 +3,7 @@ package nl.han.ica.dea.datasource.dao;
 import nl.han.ica.dea.datasource.datamappers.TracksDataMapper;
 import nl.han.ica.dea.controller.dto.TrackDTO;
 import nl.han.ica.dea.controller.dto.TracksDTO;
-import nl.han.ica.dea.service.ConnectionService;
+import nl.han.ica.dea.datasource.DatabaseConnection.ConnectionService;
 
 import javax.inject.Inject;
 import java.sql.*;

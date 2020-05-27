@@ -1,8 +1,6 @@
-package nl.han.ica.dea.service;
+package nl.han.ica.dea.datasource.DatabaseConnection;
 
 import nl.han.ica.dea.datasource.exceptions.DatabaseConnectionException;
-import nl.han.ica.dea.datasource.exceptions.DatabaseConnectionExceptionMapper;
-import nl.han.ica.dea.datasource.util.DatabaseProperties;
 
 import javax.inject.Inject;
 import java.sql.Connection;
@@ -33,6 +31,7 @@ public class ConnectionService {
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new DatabaseConnectionException();
         }
     }
 

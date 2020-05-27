@@ -3,13 +3,11 @@ package nl.han.ica.dea.datasource.dao;
 import nl.han.ica.dea.controller.dto.LoginDTO;
 import nl.han.ica.dea.controller.dto.LoginResponseDTO;
 import nl.han.ica.dea.datasource.datamappers.LoginResponseDataMapper;
-import nl.han.ica.dea.service.ConnectionService;
+import nl.han.ica.dea.datasource.DatabaseConnection.ConnectionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doThrow;

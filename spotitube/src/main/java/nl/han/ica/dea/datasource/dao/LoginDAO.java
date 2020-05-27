@@ -3,7 +3,7 @@ package nl.han.ica.dea.datasource.dao;
 import nl.han.ica.dea.controller.dto.LoginResponseDTO;
 import nl.han.ica.dea.datasource.datamappers.LoginResponseDataMapper;
 import nl.han.ica.dea.controller.dto.LoginDTO;
-import nl.han.ica.dea.service.ConnectionService;
+import nl.han.ica.dea.datasource.DatabaseConnection.ConnectionService;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.inject.Inject;

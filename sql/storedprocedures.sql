@@ -38,7 +38,7 @@ create procedure getUser (
 in 		user		 		varchar(50)
 )
 begin
-            select *
+            select fullname, token
             from user u 
             where u.user = user;
 end //

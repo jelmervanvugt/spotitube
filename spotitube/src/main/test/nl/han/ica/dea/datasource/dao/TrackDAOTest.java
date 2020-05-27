@@ -2,7 +2,7 @@ package nl.han.ica.dea.datasource.dao;
 
 import nl.han.ica.dea.controller.dto.TracksDTO;
 import nl.han.ica.dea.datasource.datamappers.TracksDataMapper;
-import nl.han.ica.dea.service.ConnectionService;
+import nl.han.ica.dea.datasource.DatabaseConnection.ConnectionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

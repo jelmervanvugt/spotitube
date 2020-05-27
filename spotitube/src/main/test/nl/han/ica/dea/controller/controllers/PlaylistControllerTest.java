@@ -4,22 +4,27 @@ import nl.han.ica.dea.controller.dto.PlaylistDTO;
 import nl.han.ica.dea.controller.dto.PlaylistsDTOTest;
 import nl.han.ica.dea.controller.dto.TrackDTO;
 import nl.han.ica.dea.controller.dto.TracksDTO;
-import nl.han.ica.dea.service.PlaylistService;
-import nl.han.ica.dea.service.TrackService;
+import nl.han.ica.dea.datasource.dao.PlaylistDAO;
+import nl.han.ica.dea.datasource.dao.TrackDAO;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 public class PlaylistControllerTest {
 
     private PlaylistController sut;
-    private PlaylistService mockedPlaylistService;
-    private TrackService mockedTrackService;
+    private PlaylistDAO mockedPlaylistDAO;
+    private TrackDAO mockedTrackDAO;
 
     private static TracksDTO tracksDTO = new TracksDTO();
     private static TrackDTO trackDTO = new TrackDTO();
@@ -33,109 +38,308 @@ public class PlaylistControllerTest {
     @BeforeEach
     public void setup() {
         sut = new PlaylistController();
-        mockedPlaylistService = Mockito.mock(PlaylistService.class);
-        mockedTrackService = Mockito.mock(TrackService.class);
+        mockedPlaylistDAO = Mockito.mock(PlaylistDAO.class);
+        mockedTrackDAO = Mockito.mock(TrackDAO.class);
 
-        sut.setPlaylistService(mockedPlaylistService);
-        sut.setTrackService(mockedTrackService);
+        sut.setPlaylistDAO(mockedPlaylistDAO);
+        sut.setTrackDAO(mockedTrackDAO);
     }
 
-    @Nested
-    class FnAddTrackToPlaylist {
-        @Test
-        public void testResponseVanEndpoint() {
-            var expected = Response.status(Response.Status.OK).entity(tracksDTO).build();
+    @Test
+    public void test1_setPlaylistDAO_works() {
+        var expected = mockedPlaylistDAO;
+        sut.setPlaylistDAO(expected);
 
-            Mockito.when(mockedTrackService.addTrackToPlaylist(token, playlistId, trackDTO)).thenReturn(expected);
-            var actual = sut.addTrackToPlaylist(token, playlistId, trackDTO);
+        var result = sut.getPlaylistDAO();
 
-            assertEquals(actual.getStatus(), expected.getStatus());
-            assertEquals(actual.getEntity(), expected.getEntity());
+        Assertions.assertEquals(expected, result);
+    }
+
+    @Test
+    public void test2_setTrackDAO_works() {
+        var expected = mockedTrackDAO;
+        sut.setTrackDAO(expected);
+
+        var result = sut.getTrackDAO();
+
+        Assertions.assertEquals(expected, result);
+    }
+
+    @Test
+    public void test3_addTrackToPlaylist_calls_DAO() {
+        try {
+            var nTimesCalled = 1;
+
+            sut.addTrackToPlaylist(token, playlistId, trackDTO);
+
+            verify(mockedTrackDAO, times(nTimesCalled)).addTrackToPlaylist(playlistId, trackDTO);
+            verify(mockedTrackDAO, times(nTimesCalled)).getAllTracksFromPlaylist(playlistId);
+
+        } catch(Exception e) {
+            fail();
         }
     }
 
-    @Nested
-    class FnDeleteTrackFromPlaylist {
-        @Test
-        public void testResponseVanEndpoint() {
-            var expected = Response.status(Response.Status.OK).entity(tracksDTO).build();
+    @Test
+    public void test4_deleteTrackFromPlaylist_calls_DAO() {
+        try {
+            var nTimesCalled = 1;
 
-            Mockito.when(mockedTrackService.deleteTrackFromPlaylist(token, playlistId, trackId)).thenReturn(expected);
-            var actual = sut.deleteTrackFromPlaylist(token, playlistId, trackId);
+            sut.deleteTrackFromPlaylist(token, playlistId, trackId);
 
-            assertEquals(actual.getStatus(), expected.getStatus());
-            assertEquals(actual.getEntity(), expected.getEntity());
+            verify(mockedTrackDAO, times(nTimesCalled)).deleteTrackFromPlaylist(playlistId, trackId);
+            verify(mockedTrackDAO, times(nTimesCalled)).getAllTracksFromPlaylist(playlistId);
+
+        } catch(Exception e) {
+            fail();
         }
     }
 
-    @Nested
-    class FnGetTracksFromPlaylist {
-        @Test
-        public void testResponseVanEndpoint() {
-            var expected = Response.status(Response.Status.OK).entity(tracksDTO).build();
+    @Test
+    public void test5_getTracksFromPlaylist_calls_DAO() {
+        try {
+            var nTimesCalled = 1;
 
-            Mockito.when(mockedTrackService.getTracksFromPlaylist(playlistId)).thenReturn(expected);
-            var actual = sut.getTracksFromPlaylist(playlistId, token);
+            sut.getTracksFromPlaylist(playlistId, token);
 
-            assertEquals(actual.getStatus(), expected.getStatus());
-            assertEquals(actual.getEntity(), expected.getEntity());
+            verify(mockedTrackDAO, times(nTimesCalled)).getAllTracksFromPlaylist(playlistId);
+
+        } catch(Exception e) {
+            fail();
         }
     }
 
-    @Nested
-    class FnEditPlaylist {
-        @Test
-        public void testResponseVanEndpoint() {
-            var expected = Response.status(Response.Status.OK).entity(playlistsDTOTest).build();
+    @Test
+    public void test6_editPlaylist_calls_DAO() {
+        try {
+            var nTimesCalled = 1;
 
-            Mockito.when(mockedPlaylistService.editPlaylistName(token, playlistDTO)).thenReturn(expected);
-            var actual = sut.editPlaylist(playlistDTO, playlistId, token);
+            sut.editPlaylist(playlistDTO, playlistId, token);
 
-            assertEquals(actual.getStatus(), expected.getStatus());
-            assertEquals(actual.getEntity(), expected.getEntity());
+            verify(mockedPlaylistDAO, times(nTimesCalled)).editPlaylistName(playlistDTO);
+            verify(mockedPlaylistDAO, times(nTimesCalled)).getAllPlaylists(token);
+
+        } catch(Exception e) {
+            fail();
         }
     }
 
-    @Nested
-    class FnAddPlaylist {
-        @Test
-        public void testResponseVanEndpoint() {
-            var expected = Response.status(Response.Status.OK).entity(playlistsDTOTest).build();
+    @Test
+    public void test7_addPlaylist_calls_DAO() {
+        try {
+            var nTimesCalled = 1;
 
-            Mockito.when(mockedPlaylistService.addPlaylist(token, playlistDTO)).thenReturn(expected);
-            var actual = sut.addPlaylist(playlistDTO, token);
+            sut.addPlaylist(playlistDTO, token);
 
-            assertEquals(actual.getStatus(), expected.getStatus());
-            assertEquals(actual.getEntity(), expected.getEntity());
+            verify(mockedPlaylistDAO, times(nTimesCalled)).addPlaylist(token, playlistDTO);
+            verify(mockedPlaylistDAO, times(nTimesCalled)).getAllPlaylists(token);
+
+        } catch(Exception e) {
+            fail();
         }
     }
 
-    @Nested
-    class FnDeletePlaylist {
-        @Test
-        public void testResponseVanEndpoint() {
-            var expected = Response.status(Response.Status.OK).entity(playlistsDTOTest).build();
+    @Test
+    public void test8_deletePlaylist_calls_DAO() {
+        try {
+            var nTimesCalled = 1;
 
-            Mockito.when(mockedPlaylistService.deletePlaylist(token, playlistId)).thenReturn(expected);
-            var actual = sut.deletePlaylist(playlistId, token);
+            sut.deletePlaylist(playlistId, token);
 
-            assertEquals(actual.getStatus(), expected.getStatus());
-            assertEquals(actual.getEntity(), expected.getEntity());
+            verify(mockedPlaylistDAO, times(nTimesCalled)).deletePlaylist(playlistId);
+            verify(mockedPlaylistDAO, times(nTimesCalled)).getAllPlaylists(token);
+
+        } catch(Exception e) {
+            fail();
         }
     }
 
-    @Nested
-    class FnGetAllPlaylists {
-        @Test
-        public void testResponseVanEndpoint() {
-            var expected = Response.status(Response.Status.OK).entity(playlistsDTOTest).build();
+    @Test
+    public void test9_getAllPlaylists_calls_DAO() {
+        try {
+            var nTimesCalled = 1;
 
-            Mockito.when(mockedPlaylistService.getAllPlaylists(token)).thenReturn(expected);
-            var actual = sut.getAllPlaylists(token);
+            sut.getAllPlaylists(token);
 
-            assertEquals(actual.getStatus(), expected.getStatus());
-            assertEquals(actual.getEntity(), expected.getEntity());
+            verify(mockedPlaylistDAO, times(nTimesCalled)).getAllPlaylists(token);
+
+        } catch(Exception e) {
+            fail();
         }
     }
 
+    @Test
+    public void test10_addTrackToPlaylist_returnsOK() {
+        try {
+            var expected = Response.Status.OK;
+
+            var result = sut.addTrackToPlaylist(token, playlistId, trackDTO);
+
+            Assertions.assertEquals(expected.getStatusCode(), result.getStatus());
+        } catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test11_addTrackToPlaylist_returns_BadRequestException() {
+        try {
+            var expected = new BadRequestException();
+            doThrow(BadRequestException.class).when(mockedTrackDAO).addTrackToPlaylist(playlistId, trackDTO);
+
+            Assertions.assertThrows(BadRequestException.class, () -> sut.addTrackToPlaylist(token, playlistId, trackDTO));
+        }  catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test12_deleteTrackFromPlaylist_returnsOK() {
+        try {
+            var expected = Response.Status.OK;
+
+            var result = sut.deleteTrackFromPlaylist(token, playlistId, trackId);
+
+            Assertions.assertEquals(expected.getStatusCode(), result.getStatus());
+        } catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test13_deleteTrackFromPlaylist_returns_BadRequestException() {
+        try {
+            var expected = new BadRequestException();
+            doThrow(BadRequestException.class).when(mockedTrackDAO).deleteTrackFromPlaylist(playlistId, trackId);
+
+            Assertions.assertThrows(BadRequestException.class, () -> sut.deleteTrackFromPlaylist(token, playlistId, trackId));
+        }  catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test14_getTracksFromPlaylist_returnsOK() {
+        try {
+            var expected = Response.Status.OK;
+
+            var result = sut.getTracksFromPlaylist(playlistId, token);
+
+            Assertions.assertEquals(expected.getStatusCode(), result.getStatus());
+        } catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test15_getTracksFromPlaylist_returns_BadRequestException() {
+        try {
+            var expected = new BadRequestException();
+            doThrow(BadRequestException.class).when(mockedTrackDAO).getAllTracksFromPlaylist(playlistId);
+
+            Assertions.assertThrows(BadRequestException.class, () -> sut.getTracksFromPlaylist(playlistId, token));
+        }  catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test16_editPlaylist_returnsOK() {
+        try {
+            var expected = Response.Status.OK;
+
+            var result = sut.editPlaylist(playlistDTO, playlistId, token);
+
+            Assertions.assertEquals(expected.getStatusCode(), result.getStatus());
+        } catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test17_editPlaylist_returns_BadRequestException() {
+        try {
+            var expected = new BadRequestException();
+            doThrow(BadRequestException.class).when(mockedPlaylistDAO).editPlaylistName(playlistDTO);
+
+            Assertions.assertThrows(BadRequestException.class, () -> sut.editPlaylist(playlistDTO, playlistId, token));
+        }  catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test18_addPlaylist_returnsOK() {
+        try {
+            var expected = Response.Status.OK;
+
+            var result = sut.addPlaylist(playlistDTO, token);
+
+            Assertions.assertEquals(expected.getStatusCode(), result.getStatus());
+        } catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test19_addPlaylist_returns_BadRequestException() {
+        try {
+            var expected = new BadRequestException();
+            doThrow(BadRequestException.class).when(mockedPlaylistDAO).addPlaylist(token, playlistDTO);
+
+            Assertions.assertThrows(BadRequestException.class, () -> sut.addPlaylist(playlistDTO, token));
+        }  catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test20_deletePlaylist_returnsOK() {
+        try {
+            var expected = Response.Status.OK;
+
+            var result = sut.deletePlaylist(playlistId, token);
+
+            Assertions.assertEquals(expected.getStatusCode(), result.getStatus());
+        } catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test21_deletePlaylist_returns_BadRequestException() {
+        try {
+            var expected = new BadRequestException();
+            doThrow(BadRequestException.class).when(mockedPlaylistDAO).deletePlaylist(playlistId);
+
+            Assertions.assertThrows(BadRequestException.class, () -> sut.deletePlaylist(playlistId, token));
+        }  catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test22_deletePlaylist_returnsOK() {
+        try {
+            var expected = Response.Status.OK;
+
+            var result = sut.getAllPlaylists(token);
+
+            Assertions.assertEquals(expected.getStatusCode(), result.getStatus());
+        } catch(Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void test23_deletePlaylist_returns_BadRequestException() {
+        try {
+            var expected = new BadRequestException();
+            doThrow(BadRequestException.class).when(mockedPlaylistDAO).getAllPlaylists(token);
+
+            Assertions.assertThrows(BadRequestException.class, () -> sut.getAllPlaylists(token));
+        }  catch(Exception e) {
+            fail();
+        }
+    }
 }
