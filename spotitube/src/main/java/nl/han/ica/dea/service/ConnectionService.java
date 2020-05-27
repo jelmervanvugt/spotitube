@@ -1,5 +1,7 @@
 package nl.han.ica.dea.service;
 
+import nl.han.ica.dea.datasource.exceptions.DatabaseConnectionException;
+import nl.han.ica.dea.datasource.exceptions.DatabaseConnectionExceptionMapper;
 import nl.han.ica.dea.datasource.util.DatabaseProperties;
 
 import javax.inject.Inject;
@@ -20,8 +22,9 @@ public class ConnectionService {
         try {
             Class.forName(databaseProperties.driverString());
             connection = DriverManager.getConnection(databaseProperties.connectionString());
-        } catch (SQLException | ClassNotFoundException e) {
-            System.out.println("Error connecting to a database: " + e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DatabaseConnectionException();
         }
     }
 
