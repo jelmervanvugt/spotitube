@@ -87,4 +87,14 @@ public class PlaylistDAO {
     public void setConnectionService(ConnectionService connectionService) {
         this.connectionService = connectionService;
     }
+
+    // Puur voor test doeleinden.
+    public PlaylistsDataMapper getPlaylistsDataMapper() {
+        return playlistsDataMapper;
+    }
+
+    // Puur voor test doeleinden.
+    public ConnectionService getConnectionService() {
+        return connectionService;
+    }
 }

@@ -80,7 +80,7 @@ public class LoginDAOTest {
 
             verify(mockedConnectionService, times(nTimesCalled)).initConnection();
             verify(mockedConnectionService, times(nTimesCalled)).closeConnection();
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
@@ -99,7 +99,7 @@ public class LoginDAOTest {
             sut.checkCredentials(loginDTO);
 
             verify(mockedLoginResponseDataMapper, times(nTimesCalled)).mapToDTO(null);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
@@ -111,8 +111,8 @@ public class LoginDAOTest {
             doThrow(Exception.class).when(mockedConnectionService).initConnection();
 
             Assertions.assertThrows(Exception.class, () -> sut.checkCredentials(loginDTO));
-        } catch(Exception e) {
-           //
+        } catch (Exception e) {
+            //
         }
     }
 
@@ -120,7 +120,7 @@ public class LoginDAOTest {
     void test6_doesUserExist_throws_Exception() {
         try {
             Assertions.assertThrows(Exception.class, () -> sut.doesUserExist(loginDTO));
-        } catch(Exception e) {
+        } catch (Exception e) {
             //
         }
     }
@@ -129,9 +129,29 @@ public class LoginDAOTest {
     void test7_generateToken_throws_Exception() {
         try {
             Assertions.assertThrows(Exception.class, () -> sut.generateToken(loginDTO));
-        } catch(Exception e) {
+        } catch (Exception e) {
             //
         }
     }
 
+    @Test
+    void test8_generateToken_calls_connectionService() {
+        try {
+            var nTimesCalled = 1;
+            doNothing().when(mockedConnectionService).initConnection();
+            doNothing().when(mockedConnectionService).closeConnection();
+            when(mockedConnectionService.getConnection()).thenReturn(mockedConnection);
+            when(mockedConnectionService.getConnection().prepareStatement(any(String.class))).thenReturn(preparedStatement);
+
+            sut.generateToken(loginDTO);
+
+            verify(mockedConnectionService, times(nTimesCalled)).initConnection();
+            verify(mockedConnectionService, times(nTimesCalled)).closeConnection();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+
+
+    }
 }

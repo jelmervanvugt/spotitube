@@ -62,4 +62,14 @@ public class TrackDAO {
     public void setConnectionService(ConnectionService connectionService)
     { this.connectionService = connectionService; }
 
+    // Puur voor test doeleinden.
+    public TracksDataMapper getTracksDataMapper() {
+        return tracksDataMapper;
+    }
+
+    // Puur voor test doeleinden.
+    public ConnectionService getConnectionService() {
+        return connectionService;
+    }
+
 }
