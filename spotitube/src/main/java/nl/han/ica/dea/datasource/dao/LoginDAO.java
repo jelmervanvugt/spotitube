@@ -71,4 +71,14 @@ public class LoginDAO {
     public void setConnectionService(ConnectionService connectionService) {
         this.connectionService = connectionService;
     }
+
+    // Puur voor test doeleinden.
+    public LoginResponseDataMapper getLoginResponseDataMapper() {
+        return  loginResponseDataMapper;
+    }
+
+    // Puur voor test doeleinden.
+    public ConnectionService getConnectionService() {
+        return connectionService;
+    }
 }
